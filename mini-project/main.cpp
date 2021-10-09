@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <ctype.h>
 
 const unsigned int SIZE = 9;
 
@@ -18,37 +20,34 @@ bool parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE]){
         - Check: Must be exact 81 digits
         - Return string
     */
+    bool success = false;
     std::ifstream file(fileName);
 
     if( file.is_open() ){
 
-        std::string textRow;
+        std::vector<char> numbers; // Replace with SudokoTable
+        char input;
+        while ( file >> input )
+        {
+            if( isdigit(input) ){ numbers.push_back(input); }
+        }
 
-        std::getline(file, textRow);
-        // while (std::getline (file, textRow)) {
-        // // Output the text from the file
-        // int i = 0;
-        // for (char c:textRow){
-        //     if(c != ','){
-        //         std::cout << c << " ";
-        //         i++;
-        //     }
-        //     if(i == 9){
-        //         std::cout << "\n";
-        //         i = 0;
-        //         }
-        //     }   
-        // }
-
-        std::cout << "\n";
+        for (size_t i = 0; i < numbers.size(); i++)
+        {
+            std::cout << numbers[i] << " ";
+            if( (i+1) % 9 == 0){ std::cout <<"\n"; }
+        }
+        std::cout << "\n" << numbers.size() << std::endl;
 
         file.close();
-        return true;
+        success = true;
     }
     else{
         std::cout << "nothing..\n";
-        return false;
+        success = false;
     };
+
+    return success;
 
 };
 
@@ -114,7 +113,6 @@ int main(int argc, char *argv[]){
 
     // Define some variables
     SudokoCell_t SudokoTable[SIZE][SIZE];
-    std::ifstream *pInputSudoko = nullptr;
     std::string fileName = "unsolved.csv";
 
 
