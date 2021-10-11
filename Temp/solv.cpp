@@ -20,10 +20,10 @@ int Arr[SIZE][SIZE] = {
     {0,0,0,0,8,0,0,7,9}
 };
 
-void checkRow(int row);
-void checkColumn(int col);
+void checkRow(const int &row);
+void checkColumn(const int &col);
 void checkSquare();
-void checkAll(int row, int col);
+void checkAll(const int &row, const int &col);
 
 // MAIN FUNCTION
 int main(){
@@ -37,27 +37,23 @@ int main(){
 }
 
 
-void checkRow(int row){
+void checkRow(const int &row){
     int tmp;
-    for (size_t i = 0; i < SIZE; i++)
-    {
+    for (size_t i = 0; i < SIZE; i++){
         if(Arr[row][i] != 0){
             tmp = Arr[row][i];
             AllNumbersArr[tmp-1] = 1;
-
         };
     }    
 };
 
 
-void checkColumn(int col){
+void checkColumn(const int &col){
     int tmp;
-    for (size_t i = 0; i < SIZE; i++)
-    {
+    for (size_t i = 0; i < SIZE; i++){
         if(Arr[i][col] != 0){
             tmp = Arr[i][col];
             AllNumbersArr[tmp-1] = 1;
-
         };
     }
 
@@ -71,7 +67,7 @@ void checkSquare(int row, int col){
 };
 
 
-void checkAll(int row, int col){
+void checkAll(const int &row, const int &col){
 
     std::cout << "Check cell: [" <<  row << "," << col << "]" << std::endl;
 

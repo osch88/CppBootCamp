@@ -4,13 +4,15 @@
 #include <vector>
 #include <ctype.h>
 
+#include "solver.h"
+
 const unsigned int SIZE = 9;
 
 
 typedef struct SudokoCell
 {
     char            value;
-    bool            possibleSolutions[SIZE];
+    bool            possibleSolutions[SIZE] = {1,1,1,1,1,1,1,1};
 }SudokoCell_t;
 
 
@@ -58,7 +60,43 @@ void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE]){
 };
 
 
-void solver();
+void checkRow(SudokoCell_t SudokoTable[][SIZE], const int &row){
+    int tmp;
+    for (size_t i = 0; i < SIZE; i++){
+        if(SudokoTable[row][i].value != 0){
+            tmp = SudokoTable[row][i].value;
+            SudokoTable[row][i].possibleSolutions[tmp-1] = false;
+        };
+    }    
+};
+
+
+void checkColumn(SudokoCell_t SudokoTable[][SIZE], const int &col){
+    int tmp;
+    for (size_t i = 0; i < SIZE; i++){
+        if(SudokoTable[i][col].value != 0){
+            tmp = SudokoTable[i][col].value;
+            SudokoTable[i][col].possibleSolutions[tmp-1] = false;
+        };
+    }
+
+};
+
+
+void checkBox(SudokoCell_t SudokoTable[][SIZE], const int &row, const int &col){
+    int tmp;
+    for (size_t i = 0; i < 3; i++){
+        for (size_t j = 0; j < 3; j++){
+            tmp = SudokoTable[3*(row - row%3)/3 + i][3*(col - col%3)/3 + j].value;
+            if( tmp !=0 ){
+                SudokoTable[3*(row - row%3)/3 + i][3*(col - col%3)/3 + j].possibleSolutions[tmp-1] = false;
+            }
+        }
+    }
+};
+
+
+bool solver(SudokoCell_t SudokoTable[][SIZE]);
 /*
     - Find all possible solutions if SudokoCell->value = 0
         - Check row for possible values
@@ -99,9 +137,25 @@ int main(int argc, char *argv[]){
     SudokoCell_t SudokoTable[SIZE][SIZE];
     std::string fileName = "unsolved.csv";
 
-
+    // Parse the input
     parser(fileName, SudokoTable);
+    // Print the unsolved Sudoko
     printer(SudokoTable);
+    // Solve the Sudoko
+    // solver(SudokoTable);
+    // Print the solved Sudoko
+    // printer(SudokoTable);
+
+    checkRow(SudokoTable, 0);
+    checkColumn(SudokoTable, 2);
+    checkBox(SudokoTable, 0, 2);
+
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        std::cout << SudokoTable[0][2].possibleSolutions[i] << " ";
+    }
+    std::cout << "\n\n";
+    
 
 
     return 0;

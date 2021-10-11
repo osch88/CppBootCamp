@@ -11,10 +11,10 @@ void print(int row, int col){
 
 int main(){
 
+    print(0,0);
     print(1,1);
-    print(4,4);
-    print(7,7);
-    print(1,4);
+    print(2,2);
+    print(3,3);
 
     return 0;
 }
