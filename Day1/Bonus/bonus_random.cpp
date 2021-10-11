@@ -21,7 +21,7 @@ int main(){
     while (i < 20)
     {
         if(randomValue == secretNumber){
-            std::cout << "\nRight answer, " << secretNumber << " Tried: " << i + 1 << " times.\n";
+            std::cout << "\nRight answer:\t" << secretNumber << "\nTried:\t" << i + 1 << " times.\n\n";
             break;
         }
         else if (randomValue > secretNumber) // Try lower
@@ -36,7 +36,6 @@ int main(){
             MIN = randomValue;
         }
 
-        srand(time(NULL));
         randomValue = rand() % ( (MAX - MIN) ) + MIN;
 
         i++;

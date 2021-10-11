@@ -74,14 +74,22 @@ void printer(SudokoCell_t SudokoTable[][SIZE]){
 /*
     - Either print to the console or export a new csv file
 */
-   for (size_t i = 0; i < SIZE; i++)
-   {
-       for (size_t j = 0; j < SIZE; j++)
-       {
-           std::cout << SudokoTable[i][j].value << " ";
-       }
-       std::cout << "\n";
-   }
+
+    std::cout << "\n----------------------------------\n";
+
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        for (size_t j = 0; j < SIZE; j++)
+        {
+            std::cout << SudokoTable[i][j].value << " ";
+            if( j!=8 ){
+                std::cout << "| ";
+            }
+        }
+        std::cout << "\n----------------------------------\n";
+    }
+    std::cout << "\n";
+
 };
 
 

@@ -25,31 +25,38 @@ int main() {
     /*
         Create the volume of the array and set random values
     */
-    for (size_t i = 0; i < sizeX; i++) // Run X times
+    for (size_t i = 0; i < sizeX; i++)              // Run X times
     {
         std::cout << "\n\n";
         Arr[i] = new unsigned int *[sizeY];
 
-        for (size_t j = 0; j < sizeY; j++) // Run Y times
-        {
+        for (size_t j = 0; j < sizeY; j++){         // Run Y times
             Arr[i][j] = new unsigned int [sizeZ];
-
-            for (size_t k = 0; k < sizeZ; k++) // Run Z times
-            {
+            for (size_t k = 0; k < sizeZ; k++){     // Run Z times
                 Arr[i][j][k] = setRandomNo();
                 std::cout << Arr[i][j][k] << " ";
             }
-            
             std::cout << "\n";
         }
     }
 
     std::cout << "\n\n";
-    delete Arr;
+
+    /*
+        Delete the 3D array
+    */
+    for (size_t i = 0; i < sizeX; i++){             // Run X times
+        for (size_t j = 0; j < sizeY; j++){         // Run Y times
+            delete[] Arr[i][j];
+        }
+        delete[] Arr[i];
+    }
+    delete[] Arr;
 
 }
 
 int setRandomNo(){
-    std::srand(std::time(nullptr));
-    return rand() % number;
+    // int result = std::srand(std::time(nullptr)) % number;
+    // return rand() % number;
+    return ( std::rand() % number );
 }

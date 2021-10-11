@@ -10,7 +10,7 @@
 
 typedef struct Node {
     int             data;
-    struct Node     *next;    
+    struct Node     *next = nullptr;    
 }Node_t;
 
 
@@ -27,9 +27,11 @@ Node_t *findLast(Node_t *LinkedList) {
 
 
 void add(Node_t *LinkedList, const int &value) {
-    // 1) find the last item
-    // 2)create a new node
-    // 3) assign & link
+    /*
+        1) find the last item
+        2) create a new node
+        3) assign & link
+    */
     if (LinkedList == nullptr) {
         LinkedList = new Node_t;
         LinkedList->data  = value;
@@ -45,41 +47,43 @@ void add(Node_t *LinkedList, const int &value) {
 
 
 Node_t *removeFromHead(Node_t *LinkedList) {
-    if (LinkedList == nullptr) {
-        return LinkedList;
-    }
     /*
         1) find the head of next and set is as new head
         2) delete head
     */
+    if (LinkedList == nullptr) {
+        return LinkedList;
+    }
+
     Node_t *next = LinkedList->next;
     delete LinkedList;
     return next;
 }
 
 
-void print(Node_t *LinkedList) {
+void print(Node_t *_LinkedList) {
     /*  
         1) loop over the list
         2) print things
     */
-    // if (LinkedList == nullptr) return;
-    while(LinkedList != nullptr) {
-        std::cout << LinkedList->data << std::endl; 
-        LinkedList = LinkedList->next;       
+    if (_LinkedList == nullptr) return;
+    while(_LinkedList != nullptr) {
+        std::cout << _LinkedList->data << std::endl; 
+        _LinkedList = _LinkedList->next;       
     }
     std::cout << "Something\n";
 }
 
-void deleteList(Node_t *LinkedList){
-    Node_t *temp = LinkedList;
-    Node_t *temp2;
 
-    while ( temp != nullptr )
+void deleteList(Node_t *LinkedList){
+    Node_t *current = LinkedList;
+    Node_t *tempNext;
+
+    while ( current != nullptr )
     {
-        temp2 = LinkedList->next;
-        delete temp;
-        temp = temp2;
+        tempNext = current->next;
+        delete current;
+        current = tempNext;
     }
     
 }
@@ -87,14 +91,14 @@ void deleteList(Node_t *LinkedList){
 
 int main (int argc, char ** argv) {
 
-    Node_t *MY_LINKED_LIST = nullptr;
+    Node_t *LinkedList = nullptr;
     // Not enough. Must create a intance new.
     
     
-    add(MY_LINKED_LIST, 12);
-    // MY_LINKED_LIST->data = 5;
+    add(LinkedList, 12);
+    // LinkedList->data = 5;
 
-    print(MY_LINKED_LIST);
+    print(LinkedList);
 
 
     
