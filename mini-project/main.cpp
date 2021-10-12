@@ -8,40 +8,46 @@
 
 const unsigned int SIZE = 9;
 
-
 typedef struct SudokoCell
 {
-    char            value;
-    bool            possibleSolutions[SIZE] = {1,1,1,1,1,1,1,1};
-}SudokoCell_t;
+    int value;
+    bool possibleSolutions[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1}; // 0 == false
+                                                                //{ 1,2,3,4,5,6,7,8,9 }
+} SudokoCell_t;
 
-
-void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE]){
+void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE])
+{
     /* 
-        - Read in a csv file to a string
+        - Read in a text file to a string [4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......]
         - Check: Must be exact 81 digits
-        - Parse the csv file into an 2D array
+        - Parse the text file into an 2D array
         - By creating a new instance of struct SudokoCell
         - Update SudokoCell->value
     */
     // bool success = false;
     std::ifstream file(fileName);
 
-    if( file.is_open() ){
+    if (file.is_open())
+    {
 
-        std::vector<char> numbers; // Replace with SudokoTable
+        std::vector<int> numbers; // Replace with SudokoTable
         char input;
-        while ( file >> input )
+        while (file >> input)
         {
-            if( isdigit(input) ){ numbers.push_back(input); }
+            if (isdigit(input))
+            {
+                numbers.push_back(static_cast<int>(input - 48));
+            }
         }
         // Need a check if size == 81
-        size_t row = 0; size_t col = 0;
+        size_t row = 0;
+        size_t col = 0;
         for (size_t k = 0; k < numbers.size(); k++)
         {
             SudokoTable[row][col].value = numbers[k];
             col++;
-            if( !(k+1)%9 ){ // Takes care of new a row in the table
+            if (!(k + 1) % 9)
+            { // Takes care of new a row in the table
                 row++;
                 col = 0;
             }
@@ -50,88 +56,179 @@ void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE]){
         file.close();
         // success = true;
     }
-    else{
+    else
+    {
         std::cout << "nothing..\n";
         // success = false;
     };
 
     // return success;
-
 };
 
-
-void checkRow(SudokoCell_t SudokoTable[][SIZE], const int &row){
-    int tmp;
-    for (size_t i = 0; i < SIZE; i++){
-        if(SudokoTable[row][i].value != 0){
-            tmp = SudokoTable[row][i].value;
-            SudokoTable[row][i].possibleSolutions[tmp-1] = false;
-        };
-    }    
-};
-
-
-void checkColumn(SudokoCell_t SudokoTable[][SIZE], const int &col){
-    int tmp;
-    for (size_t i = 0; i < SIZE; i++){
-        if(SudokoTable[i][col].value != 0){
-            tmp = SudokoTable[i][col].value;
-            SudokoTable[i][col].possibleSolutions[tmp-1] = false;
+void checkRow(SudokoCell_t SudokoTable[][SIZE], bool solutionROW[SIZE], const int &row)
+{
+    // Check all possible solutions for row
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        if (SudokoTable[row][i].value != 0)
+        {
+            int tmp = SudokoTable[row][i].value;
+            solutionROW[tmp - 1] = false;
         };
     }
-
 };
 
+void checkColumn(SudokoCell_t SudokoTable[][SIZE], bool solutionCOL[SIZE], const int &col)
+{
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        if (SudokoTable[i][col].value != 0)
+        {
+            int tmp = SudokoTable[i][col].value;
+            solutionCOL[tmp - 1] = false;
+        };
+    }
+};
 
-void checkBox(SudokoCell_t SudokoTable[][SIZE], const int &row, const int &col){
-    int tmp;
-    for (size_t i = 0; i < 3; i++){
-        for (size_t j = 0; j < 3; j++){
-            tmp = SudokoTable[3*(row - row%3)/3 + i][3*(col - col%3)/3 + j].value;
-            if( tmp !=0 ){
-                SudokoTable[3*(row - row%3)/3 + i][3*(col - col%3)/3 + j].possibleSolutions[tmp-1] = false;
+void checkBox(SudokoCell_t SudokoTable[][SIZE], bool solutionBOX[SIZE], const int &row, const int &col)
+{
+    for (size_t i = 0; i < 3; i++)
+    {
+        for (size_t j = 0; j < 3; j++)
+        {
+            int tmp = SudokoTable[3 * (row - row % 3) / 3 + i][3 * (col - col % 3) / 3 + j].value;
+            if (tmp != 0)
+            {
+                solutionBOX[tmp - 1] = false;
             }
         }
     }
 };
 
-
-bool solver(SudokoCell_t SudokoTable[][SIZE]);
-/*
+void solver(SudokoCell_t SudokoTable[][SIZE])
+{
+    /*
     - Find all possible solutions if SudokoCell->value = 0
         - Check row for possible values
         - Check column for possible values
         - Check 3x3 square for possible values
         - Update SudokoCell->possibleSolutions
-    - Iterate!
-    - Return possibleSolutions which is hopefully the solution or close to
-*/
+            - If only 1 solution, set value and restart
+    */
+    for (size_t row = 0; row < SIZE; row++)
+    {
+        for (size_t col = 0; col < SIZE; col++)
+        {
+            if (SudokoTable[row][col].value != 0)
+            {
+                bool solutionROW[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+                checkRow(SudokoTable, solutionROW, row);
+                // std::cout << "ROW: \n";
+                // for (size_t i = 0; i < SIZE; i++){
+                //     std::cout << ROW[i] << " ";
+                // }
+                // std::cout << "\n\n";
+                bool solutionCOL[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+                checkColumn(SudokoTable, solutionCOL, col);
+                // std::cout << "COL: \n";
+                // for (size_t i = 0; i < SIZE; i++){
+                //     std::cout << possSol[i] << " ";
+                // }
+                // std::cout << "\n\n";
+                bool solutionBOX[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+                checkBox(SudokoTable, solutionBOX, row, col);
+                // std::cout << "BOX: \n";
+                // for (size_t i = 0; i < SIZE; i++){
+                //     std::cout << solutionBOX[i] << " ";
+                // }
+                // std::cout << "\n\n";
+                bool solutionRESULT[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+                int solutions = 0, location = 0;
+                for (size_t i = 0; i < SIZE; i++)
+                {
+                    if (solutionROW[i] == 0 || solutionCOL[i] == 0 || solutionBOX[i] == 0)
+                    {
+                        solutionRESULT[i] = false;
+                    }
+                    else
+                    {
+                        solutions++;
+                        location = i;
+                    }
+                }
+                if (solutions == 1)                         // If yes, then we need to loop over all cells again
+                {
+                    SudokoTable[row][col].value = location + 1;
+                }
+                else
+                {
+                    for (size_t i = 0; i < SIZE; i++)
+                    {
+                        SudokoTable[row][col].possibleSolutions[i] = solutionRESULT[i];
+                    }
+                }
+            }
+        }
+    }
+}
 
-
-void printer(SudokoCell_t SudokoTable[][SIZE]){
-/*
+void printer(SudokoCell_t SudokoTable[][SIZE])
+{
+    /*
     - Either print to the console or export a new csv file
 */
 
-    std::cout << "\n----------------------------------\n";
+    // std::cout << "\n----------------------------------\n";
 
     for (size_t i = 0; i < SIZE; i++)
     {
         for (size_t j = 0; j < SIZE; j++)
         {
             std::cout << SudokoTable[i][j].value << " ";
-            if( j!=8 ){
+            if (j == 2 || j == 5)
+            {
                 std::cout << "| ";
             }
         }
-        std::cout << "\n----------------------------------\n";
+        std::cout << "\n";
+        if (i == 2 || i == 5)
+        {
+            std::cout << "------+-------+-------\n";
+        }
     }
     std::cout << "\n";
-
 };
 
+void printerPossibilities(SudokoCell_t SudokoTable[][SIZE])
+{
+    /*
+    - Either print to the console or export a new csv file
+*/
 
-int main(int argc, char *argv[]){
+    // std::cout << "\n----------------------------------\n";
+
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        for (size_t j = 0; j < SIZE; j++)
+        {
+            
+            for (size_t k = 0; k < SIZE; k++)
+            {
+                std::cout << SudokoTable[i][j].possibleSolutions[k] << "-";
+            }
+            std::cout << " | ";
+        }
+        std::cout << "\n";
+        if (i == 2 || i == 5)
+        {
+            std::cout << "------+-------+-------\n";
+        }
+    }
+    std::cout << "\n";
+};
+
+int main(int argc, char *argv[])
+{
 
     // Define some variables
     SudokoCell_t SudokoTable[SIZE][SIZE];
@@ -139,24 +236,19 @@ int main(int argc, char *argv[]){
 
     // Parse the input
     parser(fileName, SudokoTable);
+
     // Print the unsolved Sudoko
+    std::cout << "-----INPUT------\n";
     printer(SudokoTable);
+
     // Solve the Sudoko
-    // solver(SudokoTable);
+    solver(SudokoTable);
+
     // Print the solved Sudoko
-    // printer(SudokoTable);
+    std::cout << "-----OUTPUT-----\n";
+    printer(SudokoTable);
 
-    checkRow(SudokoTable, 0);
-    checkColumn(SudokoTable, 2);
-    checkBox(SudokoTable, 0, 2);
-
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        std::cout << SudokoTable[0][2].possibleSolutions[i] << " ";
-    }
-    std::cout << "\n\n";
-    
-
+    printerPossibilities(SudokoTable);
 
     return 0;
 }
