@@ -4,9 +4,8 @@
 #include <vector>
 #include <ctype.h>
 
-#include "solver.h"
-
-const unsigned int SIZE = 9;
+#include "Solver.h"
+#include "Printer.h"
 
 typedef struct SudokoCell
 {
