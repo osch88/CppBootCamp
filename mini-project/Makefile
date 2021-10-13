@@ -1,4 +1,4 @@
-# Makefile for Writing Make Files Example
+# Makefile for Sudoko Solver
  
 # *****************************************************
 # Variables to control Makefile operation
