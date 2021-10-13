@@ -13,31 +13,30 @@ void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE])
     // bool success = false;
     std::ifstream file(fileName);
 
-    if (file.is_open())
-    {
-
-        std::vector<int> numbers; // Replace with SudokoTable
+    if (file.is_open()){
+        std::vector<int> numbers;                   // Replace with SudokoTable
         char input;
-        while (file >> input)
-        {
-            if (isdigit(input))
-            {
+        while (file >> input){
+            if (isdigit(input)){
                 numbers.push_back(static_cast<int>(input - 48));
             }
+            else if (input == '.'){
+                numbers.push_back(static_cast<int>(0));
+            }           
         }
         // Need a check if size == 81
         size_t row = 0;
         size_t col = 0;
-        for (size_t k = 0; k < numbers.size(); k++)
-        {
+        for (size_t k = 0; k < numbers.size(); k++){
             SudokoTable[row][col].value = numbers[k];
             col++;
-            if (!(k + 1) % 9)
-            { // Takes care of new a row in the table
+            if (!(k + 1) % 9){                      // Takes care of new a row in the table
                 row++;
                 col = 0;
             }
         }
+
+        std::cout << "\nInput length: " << numbers.size() << "\n\n";
 
         file.close();
         // success = true;
@@ -51,14 +50,10 @@ void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE])
     // return success;
 };
 
-void printer(SudokoCell_t SudokoTable[][SIZE])
-{
+void printer(SudokoCell_t SudokoTable[][SIZE]){
     /*
     - Either print to the console or export a new csv file
-*/
-
-    // std::cout << "\n----------------------------------\n";
-
+    */
     for (size_t i = 0; i < SIZE; i++)
     {
         for (size_t j = 0; j < SIZE; j++)
@@ -78,29 +73,18 @@ void printer(SudokoCell_t SudokoTable[][SIZE])
     std::cout << "\n";
 };
 
-void printerPossibilities(SudokoCell_t SudokoTable[][SIZE])
-{
-    /*
-    - Either print to the console or export a new csv file
-*/
-
-    // std::cout << "\n----------------------------------\n";
-
+void printerPossibilities(SudokoCell_t SudokoTable[][SIZE]){
+    std::cout << "0 = false\tFirst element is value 1\n\n";
     for (size_t i = 0; i < SIZE; i++)
     {
         for (size_t j = 0; j < SIZE; j++)
         {
-            
+            std::cout << "SudokoTable[" << i << "][" << j <<"]: ";
             for (size_t k = 0; k < SIZE; k++)
             {
-                std::cout << SudokoTable[i][j].possibleSolutions[k] << "-";
+                std::cout << SudokoTable[i][j].possibleSolutions[k] << " ";
             }
-            std::cout << " | ";
-        }
-        std::cout << "\n";
-        if (i == 2 || i == 5)
-        {
-            std::cout << "------+-------+-------\n";
+            std::cout << "\n";
         }
     }
     std::cout << "\n";
