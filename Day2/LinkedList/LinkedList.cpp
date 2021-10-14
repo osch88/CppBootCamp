@@ -74,7 +74,7 @@ void print(Node_t *_LinkedList)
     */
     if (_LinkedList == nullptr)
     {
-        std::cout << "LinkedList == nullptr\n";
+        std::cout << "Print Error: LinkedList == nullptr\n\n";
         return;
     }
     while (_LinkedList != nullptr)
@@ -100,9 +100,9 @@ void deleteList(Node_t *LinkedList)
 int main(int argc, char **argv)
 {
 
-    // Node_t *LinkedList = nullptr;
-    Node_t *LinkedList = new Node_t;
-    LinkedList->data = 5;
+    Node_t *LinkedList = nullptr;
+    // Node_t *LinkedList = new Node_t;
+    // LinkedList->data = 5;
     // Not enough. Must create a intance new.
 
     add(LinkedList, 10);

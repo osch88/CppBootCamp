@@ -36,7 +36,7 @@ void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE])
             }
         }
 
-        std::cout << "\nInput length: " << numbers.size() << "\n\n";
+        // std::cout << "\nInput length: " << numbers.size() << "\n\n";
 
         file.close();
         // success = true;
@@ -54,10 +54,8 @@ void printer(SudokoCell_t SudokoTable[][SIZE]){
     /*
     - Either print to the console or export a new csv file
     */
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        for (size_t j = 0; j < SIZE; j++)
-        {
+    for (size_t i = 0; i < SIZE; i++){
+        for (size_t j = 0; j < SIZE; j++){
             std::cout << SudokoTable[i][j].value << " ";
             if (j == 2 || j == 5)
             {
@@ -73,18 +71,34 @@ void printer(SudokoCell_t SudokoTable[][SIZE]){
     std::cout << "\n";
 };
 
-void printerPossibilities(SudokoCell_t SudokoTable[][SIZE]){
-    std::cout << "0 = false\tFirst element is value 1\n\n";
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        for (size_t j = 0; j < SIZE; j++)
-        {
-            std::cout << "SudokoTable[" << i << "][" << j <<"]: ";
-            for (size_t k = 0; k < SIZE; k++)
-            {
-                std::cout << SudokoTable[i][j].possibleSolutions[k] << " ";
+void printerPossibilities(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTable[][SIZE]){
+
+    for (size_t i = 0; i < SIZE; i++){
+        for (size_t j = 0; j < SIZE; j++) {
+            if( InpTable[i][j].value == SudokoTable[i][j].value ){
+                if( SudokoTable[i][j].value == 0 ){
+                    std::cout << "\x1B[31m" << SudokoTable[i][j].value << " ";
+                }
+                else{
+                    std::cout << "\x1B[90m" << SudokoTable[i][j].value << " ";
+                }
             }
-            std::cout << "\n";
+            else{
+                std::cout << "\x1B[32m" << SudokoTable[i][j].value << " ";
+            }
+            if (j == 2 || j == 5){
+                std::cout << "\x1B[37m" << "| ";
+            }
+
+            // for (size_t k = 0; k < SIZE; k++)
+            // {
+            //     std::cout << SudokoTable[i][j].possibleSolutions[k] << " ";
+            // }
+            // std::cout << "\n";
+        }
+        std::cout << "\n";
+        if (i == 2 || i == 5){
+            std::cout << "\x1B[37m" << "------+-------+-------\n";
         }
     }
     std::cout << "\n";

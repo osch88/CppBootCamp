@@ -13,7 +13,7 @@ void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE]);
 
 void printer(SudokoCell_t SudokoTable[][SIZE]);
 
-void printerPossibilities(SudokoCell_t SudokoTable[][SIZE]);
+void printerPossibilities(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTable[][SIZE]);
 
 
 
