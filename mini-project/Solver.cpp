@@ -47,36 +47,30 @@ void solver(SudokoCell_t SudokoTable[][SIZE]){
         game = false;
         for (size_t row = 0; row < SIZE; row++){
             for (size_t col = 0; col < SIZE; col++){
-                // std::cout << "SudokoTable[" << row << "," << col << "].value = " << SudokoTable[row][col].value << "\n";
                 if (SudokoTable[row][col].value == 0){
-                    bool solutionROW[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-                    checkRow(SudokoTable, solutionROW, row);
 
-                    bool solutionCOL[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-                    checkColumn(SudokoTable, solutionCOL, col);
+                    bool _possibleSolution[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+                    checkRow(SudokoTable, _possibleSolution, row);
+                    checkColumn(SudokoTable, _possibleSolution, col);
+                    checkBox(SudokoTable, _possibleSolution, row, col);
                     
-                    bool solutionBOX[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-                    checkBox(SudokoTable, solutionBOX, row, col);
-                    
-                    bool solutionRESULT[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-                    int solutions = 0, location = 0;
+                    int solutions = 0;      // Varible that counts possible solutions in each cell aka possibleSolutions array
+                    int location = 0;       // Where in the array the solution exist. 0 = 1, 1 = 2 etc
 
                     for (size_t i = 0; i < SIZE; i++){
-                        if (solutionROW[i] == 0 || solutionCOL[i] == 0 || solutionBOX[i] == 0){
-                            solutionRESULT[i] = 0;
-                        }
-                        else {
+                        if(_possibleSolution[i] != 0){
                             solutions++;
                             location = i;
                         }
                     }
-                    if (solutions == 1){                         // If yes, then we need to loop over all cells again
+                    if (solutions == 1){
                         SudokoTable[row][col].value = location + 1;
                         game = true;
                     }
                     else {
                         for (size_t i = 0; i < SIZE; i++){
-                            SudokoTable[row][col].possibleSolutions[i] = solutionRESULT[i];
+                            SudokoTable[row][col].possibleSolutions[i] = _possibleSolution[i];
                         }
                     }
                 }
