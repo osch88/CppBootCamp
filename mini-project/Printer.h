@@ -15,7 +15,7 @@ void printer(SudokoCell_t SudokoTable[][SIZE]);
 
 void printerPossibilities(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTable[][SIZE]);
 
-
+void printCell(SudokoCell_t SudokoTable[][SIZE], int &row, int &col);
 
 
 #endif
