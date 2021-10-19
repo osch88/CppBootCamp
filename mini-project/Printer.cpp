@@ -60,7 +60,7 @@ void printer(SudokoCell_t SudokoTable[][SIZE]){
 };
 
 
-void printerPossibilities(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTable[][SIZE]){
+void printer(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTable[][SIZE]){
 
     for (size_t i = 0; i < SIZE; i++){
         for (size_t j = 0; j < SIZE; j++) {
@@ -85,7 +85,7 @@ void printerPossibilities(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTabl
                 std::cout << "\x1B[32m" << "     " << SudokoTable[i][j].value << "     ";
             }
             if (j == 2 || j == 5){
-                std::cout << "\x1B[37m" << " | ";
+                std::cout << "\x1B[0m" << " | ";
             }
         }
         std::cout << "\n";
@@ -93,7 +93,7 @@ void printerPossibilities(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTabl
             std::cout << "\x1B[37m" << "----------------------------------+-----------------------------------+----------------------------------\n";
         }
     }
-    std::cout << "\n";
+    std::cout << "\x1B[0m" << std::endl;
 };
 
 

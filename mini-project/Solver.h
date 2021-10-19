@@ -16,7 +16,7 @@ void checkBox(SudokoCell_t SudokoTable[][SIZE], bool solutionBOX[SIZE], const in
 
 bool checkIfSolved(SudokoCell_t SudokoTable[][SIZE]);
 
-bool solver(SudokoCell_t SudokoTable[][SIZE]);
+bool constraint_propagation(SudokoCell_t SudokoTable[][SIZE]);
 
 bool bruteForce(SudokoCell_t SudokoTable[][SIZE], size_t row, size_t col);
 

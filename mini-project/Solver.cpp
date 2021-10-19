@@ -11,39 +11,29 @@
 #include "Varibles.h"
 
 
-void checkRow(SudokoCell_t SudokoTable[][SIZE], bool solutionROW[SIZE], const int &row)
-{
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        if (SudokoTable[row][i].value != 0)
-        {
+void checkRow(SudokoCell_t SudokoTable[][SIZE], bool _solutionROW[SIZE], const int &row) {
+    for (size_t i = 0; i < SIZE; i++) {
+        if (SudokoTable[row][i].value != 0) {
             int tmp = SudokoTable[row][i].value;
-            solutionROW[tmp - 1] = false;
+            _solutionROW[tmp - 1] = false;
         }
     }
 }
 
-void checkColumn(SudokoCell_t SudokoTable[][SIZE], bool solutionCOL[SIZE], const int &col)
-{
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        if (SudokoTable[i][col].value != 0)
-        {
+void checkColumn(SudokoCell_t SudokoTable[][SIZE], bool solutionCOL[SIZE], const int &col) {
+    for (size_t i = 0; i < SIZE; i++) {
+        if (SudokoTable[i][col].value != 0) {
             int tmp = SudokoTable[i][col].value;
             solutionCOL[tmp - 1] = false;
         }
     }
 }
 
-void checkBox(SudokoCell_t SudokoTable[][SIZE], bool solutionBOX[SIZE], const int &row, const int &col)
-{
-    for (size_t i = 0; i < 3; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
+void checkBox(SudokoCell_t SudokoTable[][SIZE], bool solutionBOX[SIZE], const int &row, const int &col) {
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
             int tmp = SudokoTable[3 * (row - row % 3) / 3 + i][3 * (col - col % 3) / 3 + j].value;
-            if (tmp != 0)
-            {
+            if (tmp != 0) {
                 solutionBOX[tmp - 1] = false;
             }
         }
@@ -55,15 +45,14 @@ bool checkIfSolved(SudokoCell_t SudokoTable[][SIZE]){
     for (size_t row = 0; row < SIZE; row++){
         for (size_t col = 0; col < SIZE; col++){
             if (SudokoTable[row][col].value == 0){ 
-                solved = false; 
+                return false;
             }
         }
     }
     return solved;
 }
 
-
-bool solver(SudokoCell_t SudokoTable[][SIZE]){
+bool constraint_propagation(SudokoCell_t SudokoTable[][SIZE]){
 
     bool game = true, solved = true;
     while (game) {
@@ -111,32 +100,58 @@ bool solver(SudokoCell_t SudokoTable[][SIZE]){
     - try first possibleSolution
     - call for the same function again
 */
-bool bruteForce(SudokoCell_t SudokoTable[][SIZE], size_t row , size_t col) {
-    bool solved = false;
-    for (; row < SIZE; row++) {                                                 // Iterate rows
-        for (; col < SIZE; col++) {                                             // Iterate columns
-            if (SudokoTable[row][col].value == 0) {                             // IF cell's value == 0, brute force
+bool bruteForce(SudokoCell_t SudokoTable[][SIZE], size_t _row , size_t _col) {
 
-                for (size_t k = 0; k < SIZE; k++) {                             // Iterate array of possibleSolutions { 0,0,1,1,1,0,0,1}
-                    if (SudokoTable[row][col].possibleSolutions[k] != 0) {      // Continue if k in possibleSolution is not 0 == false
+    if ( _row == 8 && _col == 9 ) {
+        return true;
+    }
 
-                        SudokoTable[row][col].value = k + 1;                    // Set first value to possibleSolutions[k] + 1
-                        std::cout << "[" << row << "," << col << "] - " << SudokoTable[row][col].value << "\n";
+    if ( _col == 9 ) {
+        _row++;
+        _col = 0;
+    }
 
-                        if( solver(SudokoTable) ){                              // Call for the easy solver to check if solved and ...
-                                                                                // .. update possible values for other cells
-                            std::cout << "Solved!\n";
-                            return solved = true;
-                        }
-                        // Call for bruteForce again
-                    }
-                }
+    // If the cells value is NOT 0, then move on to the next one
+    if( SudokoTable[_row][_col].value != 0 ){
+        return bruteForce(SudokoTable, _row, _col + 1);
+    }
+
+    // Save a copy of all possibleSolutions and value in case of disaster
+    // FIXME: Need to re-do constrain propogation
+    bool tmp_possibleSolutions[SIZE];
+    for (size_t i = 0; i < SIZE; i++){
+        tmp_possibleSolutions[i] = SudokoTable[_row][_col].possibleSolutions[i];
+    }
+
+    std::vector<int> tmp;
+    for (size_t i = 0; i < SIZE; i++){
+        if( SudokoTable[_row][_col].possibleSolutions[i] != 0 ){
+            tmp.push_back(i+1);
+        }
+        tmp_possibleSolutions[i] = SudokoTable[_row][_col].possibleSolutions[i];
+    }
+    int tmp_value = SudokoTable[_row][_col].value;
+
+    bool tmpSol[SIZE] = {1,1,1,1,1,1,1,1,1};
+    checkRow(SudokoTable, tmpSol, _row);
+    checkColumn(SudokoTable, tmpSol, _col);
+    checkBox(SudokoTable, tmpSol, _row, _col);
+    
+    for( int i : tmp ) {
+        if( tmpSol[i-1] == 1 ){
+            SudokoTable[_row][_col].value = i;
+            if( bruteForce(SudokoTable, _row, _col+1) ){
+                return true;
             }
         }
     }
-    return solved;
+    // If it didn't work we have to go back to the original values
+    for (size_t i = 0; i < SIZE; i++){
+        SudokoTable[_row][_col].possibleSolutions[i] = tmp_possibleSolutions[i];
+    }
+    SudokoTable[_row][_col].value = tmp_value;
+    
+    return false;
 }
 
-/*
-    Find cell with the most few possible solutions
-*/
+
