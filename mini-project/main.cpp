@@ -9,16 +9,17 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     
     // Define some variables
-    SudokoCell_t SudokoTable[SIZE][SIZE];
-    SudokoCell_t InpTable[SIZE][SIZE];
+    Sudoku SudokoTable;
+    Sudoku InpTable;
+
     // std::string fileName = "input/unsolved.csv";             // 0 ms
     // std::string fileName = "input/marie.txt";                // 0 ms
-    std::string fileName = "input/sudoko.txt";               // 9765 ms
+    // std::string fileName = "input/sudoko.txt";               // 9765 ms -> 1317 ms
     // std::string fileName = "input/suduko_easy.csv";          // 0 ms
     // std::string fileName = "input/suduko1.csv";              // 0 ms
-    // std::string fileName = "input/suduko2.csv";              // 250 ms
-    // std::string fileName = "input/suduko3.csv";              // 184 ms
-    // std::string fileName = "input/suduko4.csv";              // 65779 ms
+    std::string fileName = "input/suduko2.csv";              // 250 ms -> 34 ms
+    // std::string fileName = "input/suduko3.csv";              // 184 ms -> 28 ms
+    // std::string fileName = "input/suduko4.csv";              // 65779 ms -> 9478 ms
     // std::string fileName = "input/sudoko5.csv";              // 0 ms
 
     // Parse the input
@@ -26,7 +27,6 @@ int main(int argc, char *argv[])
     parser(fileName, InpTable);
 
     // Print the unsolved Sudoko
-    std::cout << "\n\n------- INPUT -------\n";
     printer(SudokoTable);
 
     // Solve the Sudoko
@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
     else {
         std::cout << "\nSudoku totally impossible\n" << std::endl;
     }
+
+    // Print the solved Sudoko
     printer(SudokoTable, InpTable);    
     std::cout << "\n\n";
 
