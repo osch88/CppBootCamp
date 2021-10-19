@@ -11,15 +11,15 @@ int main(int argc, char *argv[])
     // Define some variables
     SudokoCell_t SudokoTable[SIZE][SIZE];
     SudokoCell_t InpTable[SIZE][SIZE];
-    // std::string fileName = "input/unsolved.csv";
-    // std::string fileName = "input/marie.txt";
-    // std::string fileName = "input/sudoko.txt";
-    // std::string fileName = "input/suduko_easy.csv";
-    // std::string fileName = "input/suduko1.csv";
-    std::string fileName = "input/suduko2.csv";
-    // std::string fileName = "input/suduko3.csv";
-    // std::string fileName = "input/suduko4.csv";
-    // std::string fileName = "input/sudoko5.csv";
+    // std::string fileName = "input/unsolved.csv";             // 0 ms
+    // std::string fileName = "input/marie.txt";                // 0 ms
+    std::string fileName = "input/sudoko.txt";               // 9765 ms
+    // std::string fileName = "input/suduko_easy.csv";          // 0 ms
+    // std::string fileName = "input/suduko1.csv";              // 0 ms
+    // std::string fileName = "input/suduko2.csv";              // 250 ms
+    // std::string fileName = "input/suduko3.csv";              // 184 ms
+    // std::string fileName = "input/suduko4.csv";              // 65779 ms
+    // std::string fileName = "input/sudoko5.csv";              // 0 ms
 
     // Parse the input
     parser(fileName, SudokoTable);
@@ -28,10 +28,6 @@ int main(int argc, char *argv[])
     // Print the unsolved Sudoko
     std::cout << "\n\n------- INPUT -------\n";
     printer(SudokoTable);
-
-    // Print the constraint_propagation Sudoku
-    // printer(SudokoTable, InpTable);
-    // constraint_propagation(SudokoTable);
 
     // Solve the Sudoko
     if(constraint_propagation(SudokoTable)){
