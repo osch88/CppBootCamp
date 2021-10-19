@@ -117,9 +117,10 @@ bool bruteForce(Sudoku SudokuTable, size_t _row , size_t _col) {
     }
     
     // Save a copy of all possibleSolutions and value in case of disaster
-    int tmp_value = SudokuTable[_row][_col].value;
+    // int tmp_value = SudokuTable[_row][_col].value;
 
     // TODO: Can this be iterated in a faster way?
+    // Check possible solutions for this cell before brute forcing
     bool tmpSol[SIZE] = {1,1,1,1,1,1,1,1,1};
     checkRow(SudokuTable, tmpSol, _row);
     checkColumn(SudokuTable, tmpSol, _col);
@@ -134,7 +135,8 @@ bool bruteForce(Sudoku SudokuTable, size_t _row , size_t _col) {
         }
     }
     
-    SudokuTable[_row][_col].value = tmp_value;
+    // SudokuTable[_row][_col].value = tmp_value;
+    SudokuTable[_row][_col].value = 0;
     
     return false;
 }

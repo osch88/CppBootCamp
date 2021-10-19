@@ -5,10 +5,10 @@
     - Read in a text file to a string [4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......]
     - Check: Must be exact 81 digits
     - Parse the text file into an 2D array
-    - By creating a new instance of struct SudokoCell
-    - Update SudokoCell->value
+        - By creating a new instance of struct SudokoCell
+        - Update SudokoCell->value
 */
-void parser( const std::string &fileName, Sudoku _SudokoTable ){
+bool parser( const std::string &fileName, Sudoku _SudokoTable ){
     std::ifstream file(fileName);
 
     if ( file.is_open() ){
@@ -22,7 +22,12 @@ void parser( const std::string &fileName, Sudoku _SudokoTable ){
                 numbers.push_back(static_cast<int>(0));
             }           
         }
+
         // Need a check if size == 81
+        if( numbers.size() != 81 ){
+           return false;
+        }
+
         size_t row = 0, col = 0;
         for (size_t k = 0; k < numbers.size(); k++){
             _SudokoTable[row][col].value = numbers[k];
@@ -33,32 +38,12 @@ void parser( const std::string &fileName, Sudoku _SudokoTable ){
             }
         }
         file.close();
+        return true;
     }
-    else {
-        std::cout << "nothing..\n";
-    };
+
+    return false;
 };
 
-// void printer(SudokoCell_t SudokuTable[][SIZE]){
-// void printer(Sudoku _SudokoTable){
-//     /*
-//     - Either print to the console or export a new csv file
-//     */
-//     for (size_t i = 0; i < SIZE; i++){
-//         for (size_t j = 0; j < SIZE; j++){
-//             std::cout << _SudokoTable[i][j].value << " ";
-//             if (j == 2 || j == 5)
-//             {
-//                 std::cout << "| ";
-//             }
-//         }
-//         std::cout << "\n";
-//         if (i == 2 || i == 5){
-//             std::cout << "------+-------+-------\n";
-//         }
-//     }
-//     std::cout << "\n";
-// };
 void printer(Sudoku _SudokoTable){
     std::cout << "\x1B[0m" << "\n----------------------------------+---------------INPUT---------------+----------------------------------\n";
     for (size_t i = 0; i < SIZE; i++){
@@ -81,15 +66,15 @@ void printer(Sudoku _SudokoTable){
     std::cout << "\x1B[0m" << std::endl;
 };
 
-void printer(Sudoku _SudokoTable, Sudoku _InpTable){
-    std::cout << "\x1B[0m" << "\n----------------------------------+---------------OUTPUT--------------+----------------------------------\n";
+void printer(Sudoku _SudokuTable, Sudoku _InpTable, const std::string &text) {
+    std::cout << "\x1B[0m" << "\n----------------------------------+---------------"<< text <<"--------------+----------------------------------\n";
     for (size_t i = 0; i < SIZE; i++){
         for (size_t j = 0; j < SIZE; j++) {
-            if( _InpTable[i][j].value == _SudokoTable[i][j].value ){
-                if( _SudokoTable[i][j].value == 0 ){
+            if( _InpTable[i][j].value == _SudokuTable[i][j].value ){
+                if( _SudokuTable[i][j].value == 0 ){
                     std::cout << "\x1B[31m" << "[";
                     for (size_t k = 0; k < SIZE; k++){
-                        if( _SudokoTable[i][j].possibleSolutions[k] == 0){
+                        if( _SudokuTable[i][j].possibleSolutions[k] == 0){
                             std::cout << "_";
                         }
                         else {
@@ -99,11 +84,11 @@ void printer(Sudoku _SudokoTable, Sudoku _InpTable){
                     std::cout << "\x1B[31m" << "]";
                 }
                 else{
-                    std::cout << "\x1B[90m" << "     " << _SudokoTable[i][j].value << "     ";
+                    std::cout << "\x1B[90m" << "     " << _SudokuTable[i][j].value << "     ";
                 }
             }
             else{
-                std::cout << "\x1B[32m" << "     " << _SudokoTable[i][j].value << "     ";
+                std::cout << "\x1B[32m" << "     " << _SudokuTable[i][j].value << "     ";
             }
             if (j == 2 || j == 5){
                 std::cout << "\x1B[0m" << " | ";

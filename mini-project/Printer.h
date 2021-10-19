@@ -9,13 +9,13 @@
 
 
 
-void parser(const std::string &fileName, SudokoCell_t SudokoTable[][SIZE]);
+bool parser(const std::string &fileName, Sudoku SudokuTable);
 
-void printer(SudokoCell_t SudokoTable[][SIZE]);
+void printer(Sudoku SudokuTable);
 
-void printer(SudokoCell_t SudokoTable[][SIZE], SudokoCell_t InpTable[][SIZE]);
+void printer(Sudoku SudokuTable, Sudoku InpTable, const std::string &text);
 
-void printCell(SudokoCell_t SudokoTable[][SIZE], int &row, int &col);
+void printCell(Sudoku SudokuTable, int &row, int &col);
 
 
 #endif
