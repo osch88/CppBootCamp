@@ -5,18 +5,21 @@
  
 CC = g++
 CFLAGS = -Wall -g
- 
+
+OBJFILES = main.o Varibles.o Solver.o Printer.o
+TARGET = bin/main
+SRC = ./src
+INCLUDE = ./include
+
 # ****************************************************
-# Targets needed to bring the executable up to date
- 
-main: main.o Solver.o Printer.o
-	$(CC) $(CFLAGS) -o main main.o Solver.o Printer.o
- 
-# The main.o target can be written more simply
- 
-main.o: main.cpp Solver.h Printer.h
-	$(CC) $(CFLAGS) -c main.cpp
- 
-Solver.o: Solver.h
- 
-Printer.o: Printer.h
+
+all: $(TARGET)
+
+$(TARGET): $(OBJFILES)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES)
+
+%.o: $(SRC)/%.cpp 
+	$(CC) -I$(INCLUDE) -c $< -o $@
+
+clean:
+	rm -f $(OBJFILES) $(TARGET) *~

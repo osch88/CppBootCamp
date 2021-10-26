@@ -6,7 +6,6 @@ Implement a function that can read the information shown in the figure.
 Assignment 1: write a function that receives uint16_t as an input, and print out the status of 5 seatbelts, 4 windows, 4 doors and 3 lights. For example if we have 1101 for doors, first door is open and second door is closed, third and fourth are open
 */
 #include <iostream>
-// #include <stdint.h>
 #include <bitset>
 #include <string>
 
