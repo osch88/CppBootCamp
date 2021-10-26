@@ -62,7 +62,7 @@ bool parser(const std::string &oneLine, Sudoku _SudokoTable)
     }
     return true;
 }
-void easyPrinter(Sudoku _SudokuTable, Sudoku _InpTable)
+void printSudokuOnOneLine(Sudoku _SudokuTable, Sudoku _InpTable)
 {
     for (size_t i = 0; i < SIZE; i++)
     {

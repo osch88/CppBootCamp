@@ -2,11 +2,13 @@
 #include "Printer.h"
 #include <chrono>
 
+// Used to count how many iterations are needed for Brute force
 extern int global_iterations;
 
 
 int main(int argc, char *argv[])
 {
+    // Clock the performance
     auto start = std::chrono::high_resolution_clock::now();
 
     std::cout << "WELCOME TO SUDOKU SOLVER!\n\n";
@@ -30,36 +32,30 @@ int main(int argc, char *argv[])
             // Solve the Sudoko
             if (parser(oneLine, SudokoTable))
             {
-                
                 // Make a copy as reference
                 parser(oneLine, InpTable);
-                
+                // Do constaint propagation and then print out how far we have reached.   
                 auto constrainOK = constraint_propagation(SudokoTable);
                 std::cout << "Const. Prop:\t";
-                easyPrinter(SudokoTable, InpTable);
+                printSudokuOnOneLine(SudokoTable, InpTable);
 
-                if (!constrainOK)
-                {
-                    if (bruteForce(SudokoTable, 0, 0))
-                    {
+                if (!constrainOK) {
+                    if (bruteForce(SudokoTable, 0, 0)) {
                         std::cout << "Brute Force:\t";
-                        easyPrinter(SudokoTable, InpTable);
+                        printSudokuOnOneLine(SudokoTable, InpTable);
                         std::cout << "Solver:\t\tBRUTE FORCE\n";
                         iterationPrint();
                     }
-                    else
-                    {
+                    else {
                         std::cout << "Sudoku totally IMPOSSIBLE to solve\n"
                                   << std::endl;
                     }
                 }
-                else
-                {
+                else {
                     std::cout << "Solver:\t\tCONSTRAIN PROPOGATION\n";
                 }
             }
-            else
-            {
+            else {
                 std::cout << "Could not parse the input file" << std::endl;
             }
 

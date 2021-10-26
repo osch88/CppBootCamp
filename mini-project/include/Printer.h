@@ -12,7 +12,7 @@ bool gettingLine(const std::string &fileName, std::vector<std::string> &allLines
 
 bool parser(const std::string &fileName, Sudoku SudokuTable);
 
-void easyPrinter(Sudoku _SudokuTable, Sudoku _InpTable);
+void printSudokuOnOneLine(Sudoku _SudokuTable, Sudoku _InpTable);
 
 // void printer(Sudoku SudokuTable);
 

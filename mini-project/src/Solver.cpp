@@ -6,11 +6,12 @@
     - Update SudokoCell->possibleSolutions
         - If only 1 solution, set value and restart
 */
+#include "Varibles.h"
 #include "Solver.h"
 #include "Printer.h"
-#include "Varibles.h"
 
 int global_iterations = 0;
+
 
 void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&_solutionROW)[SIZE], const int &row) {
     for (size_t i = 0; i < SIZE; i++) {
@@ -33,7 +34,7 @@ void checkColumn(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionCOL)[SI
 void checkBox(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionBOX)[SIZE], const int &row, const int &col) {
     for (size_t i = 0; i < 3; i++) {
         for (size_t j = 0; j < 3; j++) {
-            int tmp = SudokuTable[3 * (row - row % 3) / 3 + i][3 * (col - col % 3) / 3 + j].value;  // TODO: row / 3 * 3
+            int tmp = SudokuTable[(row - row % 3) + i][ (col - col % 3) + j].value;
             if (tmp != 0) {
                 solutionBOX[tmp - 1] = false;
             }
@@ -62,13 +63,15 @@ bool constraint_propagation(SudokoCell (&SudokuTable)[SIZE][SIZE]) {
             for (size_t col = 0; col < SIZE; col++){
                 if (SudokuTable[row][col].value == 0){
                     bool _possibleSolution[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+                    // bool _possibleSolution = SudokuTable[row][col].possibleSolutions[SIZE]; // TODO: would be nice to avoid creating another bool array...
+
 
                     checkRow(SudokuTable, _possibleSolution, row);
                     checkColumn(SudokuTable, _possibleSolution, col);
                     checkBox(SudokuTable, _possibleSolution, row, col);
 
-                    int solutions = 0; // Varible that counts possible solutions in each cell aka possibleSolutions array
-                    int location = 0;  // Where in the array the solution exist. 0 = 1, 1 = 2 etc
+                    int solutions = 0;                  // Varible that counts possible solutions in each cell aka possibleSolutions array
+                    int location = 0;                   // Where in the array the solution exist. 0 = 1, 1 = 2 etc // TODO: look into use bits instead of looping array
 
                     for (size_t i = 0; i < SIZE; i++) {
                         if (_possibleSolution[i] != 0) {
@@ -115,9 +118,8 @@ bool bruteForce(SudokoCell_t (&SudokuTable)[SIZE][SIZE], size_t _row , size_t _c
         return bruteForce(SudokuTable, _row, _col + 1);
     }
 
-    // TODO: Can this be iterated in a faster way?
     // Check possible solutions for this cell before brute forcing
-    bool tmpSol[SIZE] = {1,1,1,1,1,1,1,1,1};
+    bool tmpSol[SIZE] = {1,1,1,1,1,1,1,1,1}; // TODO: look into use bits instead of looping array
     checkRow(SudokuTable, tmpSol, _row);
     checkColumn(SudokuTable, tmpSol, _col);
     checkBox(SudokuTable, tmpSol, _row, _col);
