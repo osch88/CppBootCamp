@@ -10,6 +10,7 @@
 #include "Printer.h"
 #include "Varibles.h"
 
+int global_iterations = 0;
 
 void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&_solutionROW)[SIZE], const int &row) {
     for (size_t i = 0; i < SIZE; i++) {
@@ -99,7 +100,6 @@ bool constraint_propagation(SudokoCell (&SudokuTable)[SIZE][SIZE]) {
     - try first possibleSolution
     - call for the same function again
 */
-int iterations = 0;
 bool bruteForce(SudokoCell_t (&SudokuTable)[SIZE][SIZE], size_t _row , size_t _col) {
     if ( _row == 8 && _col == 9 ) {
         return true;
@@ -132,11 +132,11 @@ bool bruteForce(SudokoCell_t (&SudokuTable)[SIZE][SIZE], size_t _row , size_t _c
     }
     
     SudokuTable[_row][_col].value = 0;
-    iterations++;
+    global_iterations++;
 
     return false;
 }
 
 void iterationPrint(){
-    std::cout << "Iterations:\t" << iterations  << std::endl;
+    std::cout << "Iterations:\t" << global_iterations  << std::endl;
 }

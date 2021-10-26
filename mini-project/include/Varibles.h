@@ -3,6 +3,7 @@
 
 const unsigned int SIZE = 9;
 
+
 typedef struct SudokoCell
 {
     int value;

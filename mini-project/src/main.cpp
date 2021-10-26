@@ -2,6 +2,9 @@
 #include "Printer.h"
 #include <chrono>
 
+extern int global_iterations;
+
+
 int main(int argc, char *argv[])
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -11,7 +14,7 @@ int main(int argc, char *argv[])
     SudokoCell_t SudokoTable[SIZE][SIZE];
     SudokoCell_t InpTable[SIZE][SIZE];
 
-    std::string filename = "data/input/rashid.txt";                     // <-- @RASHID, CHANGE TARGET TO RIGHT SUDOKU FILE
+    std::string filename = "data/input/random.txt";                     // <-- @RASHID, CHANGE TARGET TO RIGHT SUDOKU FILE
 
     std::vector<std::string> allSudokus;
     if (gettingLine(filename, allSudokus))
@@ -65,6 +68,8 @@ int main(int argc, char *argv[])
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
             std::cout << "Timestamp:\t" << duration.count() << " milliseconds\n" << std::endl;
+
+            ::global_iterations = 0;
         }
     }
 
