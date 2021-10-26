@@ -8,21 +8,17 @@
 #include <vector>
 #include <ctype.h>
 
-void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool solutionROW[SIZE], const int &row);
+void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionROW)[SIZE], const int &row);
 
-void checkColumn(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool solutionCOL[SIZE], const int &col);
+void checkColumn(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionCOL)[SIZE], const int &col);
 
-void checkBox(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool solutionBOX[SIZE], const int &row, const int &col);
+void checkBox(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionBOX)[SIZE], const int &row, const int &col);
 
 bool checkIfSolved(SudokoCell_t (&SudokuTable)[SIZE][SIZE]);
 
 bool constraint_propagation(SudokoCell_t (&SudokuTable)[SIZE][SIZE]);
-// bool constraint_propagation(SudokoCell_t SudokuTable[][SIZE]);
-// bool constraint_propagation(SudokoCell_t *SudokuTable[SIZE]); //TODO: fix this!
-
 
 bool bruteForce(SudokoCell_t (&SudokuTable)[SIZE][SIZE], size_t _row , size_t _col);
-
 
 void iterationPrint();
 

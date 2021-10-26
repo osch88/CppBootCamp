@@ -11,7 +11,7 @@
 #include "Varibles.h"
 
 
-void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool _solutionROW[SIZE], const int &row) {
+void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&_solutionROW)[SIZE], const int &row) {
     for (size_t i = 0; i < SIZE; i++) {
         if( SudokuTable[row][i].value != 0 ) {
             int tmp = SudokuTable[row][i].value;
@@ -20,7 +20,7 @@ void checkRow(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool _solutionROW[SIZE], 
     }
 }
 
-void checkColumn(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool solutionCOL[SIZE], const int &col) {
+void checkColumn(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionCOL)[SIZE], const int &col) {
     for (size_t i = 0; i < SIZE; i++) {
         if (SudokuTable[i][col].value != 0) {
             int tmp = SudokuTable[i][col].value;
@@ -29,7 +29,7 @@ void checkColumn(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool solutionCOL[SIZE]
     }
 }
 
-void checkBox(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool solutionBOX[SIZE], const int &row, const int &col) {
+void checkBox(SudokoCell_t (&SudokuTable)[SIZE][SIZE], bool (&solutionBOX)[SIZE], const int &row, const int &col) {
     for (size_t i = 0; i < 3; i++) {
         for (size_t j = 0; j < 3; j++) {
             int tmp = SudokuTable[3 * (row - row % 3) / 3 + i][3 * (col - col % 3) / 3 + j].value;  // TODO: row / 3 * 3
@@ -114,9 +114,6 @@ bool bruteForce(SudokoCell_t (&SudokuTable)[SIZE][SIZE], size_t _row , size_t _c
     if( SudokuTable[_row][_col].value != 0 ){
         return bruteForce(SudokuTable, _row, _col + 1);
     }
-    
-    // Save a copy of all possibleSolutions and value in case of disaster
-    // int tmp_value = SudokuTable[_row][_col].value;
 
     // TODO: Can this be iterated in a faster way?
     // Check possible solutions for this cell before brute forcing
@@ -129,18 +126,12 @@ bool bruteForce(SudokoCell_t (&SudokuTable)[SIZE][SIZE], size_t _row , size_t _c
         if( tmpSol[i] == 1 ){
             SudokuTable[_row][_col].value = i+1;
             if( bruteForce(SudokuTable, _row, _col+1) ){
-                // std::cout << "Iterations needed: " << iterations << std::endl;
                 return true;
             }
         }
     }
     
-    // SudokuTable[_row][_col].value = tmp_value;
     SudokuTable[_row][_col].value = 0;
-    
-
-    // std::cout << "Iterations needed: " << iterations << std::endl;
-
     iterations++;
 
     return false;

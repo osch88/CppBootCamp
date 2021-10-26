@@ -68,11 +68,13 @@ void easyPrinter(Sudoku _SudokuTable, Sudoku _InpTable)
     {
         for (size_t j = 0; j < SIZE; j++)
         {
-            if (_InpTable[i][j].value != 0)
-            {
-                std::cout << "\x1B[97m"
-                          << _InpTable[i][j].value;
-                        //   << _SudokuTable[i][j].value;
+            if(_SudokuTable[i][j].value == 0){
+                std::cout << "\x1B[0m"
+                          << ".";
+            }
+            else if( _SudokuTable[i][j].value == _InpTable[i][j].value ) {
+                std::cout << "\x1B[31m"
+                          << _SudokuTable[i][j].value;
             }
             else
             {
