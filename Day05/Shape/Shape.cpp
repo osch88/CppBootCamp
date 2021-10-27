@@ -6,8 +6,8 @@ void Shape::print()
 }
 bool Shape::operator>(const Shape &s)
 {
-    if ((this->area > s.area) ||
-        ((this->area == s.area)) && (this->perimeter > s.perimeter))
+    if ( (this->area > s.area) ||
+        ( (this->area == s.area) && (this->perimeter > s.perimeter) ) )
     {
         return true;
     }
@@ -24,8 +24,8 @@ bool Shape::operator==(const Shape &s)
 
 bool Shape::operator<(const Shape &s)
 {
-    if ((this->area < s.area) ||
-        ((this->area == s.area)) && (this->perimeter < s.perimeter))
+    if ( (this->area < s.area) ||
+        ( (this->area == s.area) && (this->perimeter < s.perimeter) ) )
     {
         return true;
     }

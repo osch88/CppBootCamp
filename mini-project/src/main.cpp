@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     SudokoCell_t SudokoTable[SIZE][SIZE];
     SudokoCell_t InpTable[SIZE][SIZE];
 
-    std::string filename = "data/input/random.txt";                     // <-- @RASHID, CHANGE TARGET TO RIGHT SUDOKU FILE
+    std::string filename = "../data/input/random.txt";                     // <-- @RASHID, CHANGE TARGET TO RIGHT SUDOKU FILE
 
     std::vector<std::string> allSudokus;
     if (gettingLine(filename, allSudokus))

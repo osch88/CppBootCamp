@@ -7,9 +7,9 @@ CC = g++
 CFLAGS = -Wall -g
 
 OBJFILES = main.o Varibles.o Solver.o Printer.o
-TARGET = bin/main
-SRC = ./src
-INCLUDE = ./include
+TARGET = ../bin/main
+SRC = ../src
+INCLUDE = ../include
 
 # ****************************************************
 

@@ -1,20 +1,14 @@
-# Makefile for Sudoko Solver
- 
-# *****************************************************
-# Variables to control Makefile operation
+# Makefile for Shape
  
 CC = g++
-CFLAGS = -Wall -g
+CPPFLAGS = -Wall -g
  
 # ****************************************************
-# Targets needed to bring the executable up to date
- 
-main: main.o Shape.o
-	$(CC) $(CFLAGS) -o main main.o Shape.o
- 
-# The main.o target can be written more simply
- 
-main.o: main.cpp Shape.hpp
-	$(CC) $(CFLAGS) -c main.cpp
- 
-Solver.o: Shape.hpp
+
+libShape.so: Shape.cpp Shape.hpp
+	@echo "Creating libShape.so"
+	$(CC) $(CPPFLAGS) -fPIC -shared -c Shape.cpp -o libShape.so
+
+clean:
+	@echo "Deleting..."
+	rm -f *.so
