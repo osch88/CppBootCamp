@@ -163,37 +163,35 @@ bool Puzzle::bruteForce(unsigned int _row, unsigned int _col) {
     bool success = false;
 
     if ( _row == 8 && _col == 9 ) {
-        success = true;
+        return true;
     }
-    else if ( _col == 9 ) {
+    if ( _col == 9 ) {
         _row++;
         _col = 0;
     }
     // If the cells value is NOT 0, then move on to the next one
-    else if( SudokuTable[_row][_col].value != 0 ){
-        bruteForce( _row, _col + 1);
+    if( SudokuTable[_row][_col].value != 0 ){
+        return bruteForce( _row, _col + 1);
     }
-    else {
-        // Check possible solutions for this cell before brute forcing
-        bool peers[SIZE] = {1,1,1,1,1,1,1,1,1}; // TODO: look into use bits instead of looping array
+    // Check possible solutions for this cell before brute forcing
+    bool peers[SIZE] = {1,1,1,1,1,1,1,1,1}; // TODO: look into use bits instead of looping array
 
-        checkRow( peers, _row);
-        checkCol( peers, _col);
-        checkBox( peers, _row, _col);
+    checkRow( peers, _row);
+    checkCol( peers, _col);
+    checkBox( peers, _row, _col);
 
-        for (size_t i = 0; i < SIZE; i++) {
-            if( peers[i] == 1 ){
-                SudokuTable[_row][_col].value = i+1;
-                if( bruteForce(_row, _col+1) ){
-                    success = true;
-                    break;
-                    // return true;
-                }
+    for (size_t i = 0; i < SIZE; i++) {
+        if( peers[i] == 1 ){
+            SudokuTable[_row][_col].value = i+1;
+            if( bruteForce(_row, _col+1) ){
+                success = true;
+                // break;
+                return true;
             }
         }
-        SudokuTable[_row][_col].value = 0;
     }
-    return success;
+    SudokuTable[_row][_col].value = 0;
+    return false;
 }
 
 void Puzzle::printSudokuOnOneLine() {
@@ -201,16 +199,17 @@ void Puzzle::printSudokuOnOneLine() {
     for (size_t _row = 0; _row < SIZE; _row++) {
         for (size_t _col = 0; _col < SIZE; _col++) {
             char now = SudokuLine[stringIndex];
-            if( ( SudokuTable[_row][_col].value == (now - 48) ) || ( (now - 48) == 0 ) ) {  //TODO: Not working
+            if( (SudokuTable[_row][_col].value == 0)  ) { //TODO: Not working
+                std::cout << "\x1B[0m"
+                          << ".";
+            }
+            else if( ( SudokuTable[_row][_col].value == (now - 48) ) ) {  // IF same value in solution as in input
                 std::cout << "\x1B[0m"
                           << SudokuTable[_row][_col].value;
             }
-            else if( (SudokuTable[_row][_col].value != 0) || ( (now - 48) == 0 ) ) { //TODO: Not working
-                std::cout << "\x1B[32m"
-                          << ".";
-            }
+            
             else {
-                std::cout << "\x1B[31m"
+                std::cout << "\033[1m\033[32m"
                           << SudokuTable[_row][_col].value;
             }
             stringIndex++;
