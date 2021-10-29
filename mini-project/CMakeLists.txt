@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-project(Sudoku)
+project(Sudoku VERSION "0.1" DESCRIPTION "Solves all Sudokus")
 
 # .h files
 include_directories(include)
 
-set(SOURCES src/main.cpp src/Varibles.cpp src/Solver.cpp src/Printer.cpp)
+set(SOURCES src/main.cpp src/varibles.cpp src/puzzle.cpp src/importer.cpp)
 
 add_executable(Sudoku ${SOURCES})
