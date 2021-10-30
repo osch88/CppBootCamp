@@ -8,24 +8,24 @@ Puzzle::Puzzle(const std::string &_SudokuLine) {
 void Puzzle::solver(){
     if( parser() ){
         
-        std::cout << "Input Sudoko:\t\t\t";
+        std::cout << "Input Sudoko:\t\t";
         printSudokuOnOneLine();
         std::cout << std::endl;
 
         if( constraintPropagation() ){
             solved = "Constrain Propogation";
-            std::cout << "Constrain Propogation:\t\t";
+            std::cout << "Constrain Propogation:\t";
             printSudokuOnOneLine();
             std::cout << std::endl;
         }
         else{
-            std::cout << "Constrain Propogation:\t\t";
+            std::cout << "Constrain Propogation:\t";
             printSudokuOnOneLine();
             std::cout << std::endl;
 
-            if( bruteForce(0,0) ){
+            if( search(0,0) ){
                 solved = "Brute force";
-                std::cout << "Bruteforce:\t\t\t";
+                std::cout << "Bruteforce:\t\t";
                 printSudokuOnOneLine();
                 std::cout << std::endl;
             }
@@ -43,7 +43,8 @@ void Puzzle::solver(){
 bool Puzzle::parser(){
     bool solved = false;
     std::vector<int> numbers;
-    for (char input : SudokuLine) {
+
+    for (char &input : SudokuLine) {
         if (isdigit(input)) {
             numbers.push_back(static_cast<int>(input - 48));
         }
@@ -66,6 +67,32 @@ bool Puzzle::parser(){
             }
         }
         solved = true;
+    }
+    return solved;
+}
+
+bool Puzzle::usedInRow(const unsigned int &row, const unsigned int &num){
+    bool solved = false;
+    for (size_t i = 0; i < SIZE; i++) {
+        if( SudokuTable[row][i].value == num) solved = true;
+    }
+    return solved;
+}
+
+bool Puzzle::usedInCol(const unsigned int &col, const unsigned int &num){
+    bool solved = false;
+    for (size_t i = 0; i < SIZE; i++) {
+        if( SudokuTable[i][col].value == num) solved = true;
+    }
+    return solved;
+}
+
+bool Puzzle::usedInBox(const unsigned int &row, const unsigned int &col, const unsigned int &num){
+    bool solved = false;
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            if( SudokuTable[(row - row % 3) + i][ (col - col % 3) + j].value == num) solved = true;
+        }
     }
     return solved;
 }
@@ -122,19 +149,20 @@ bool Puzzle::checkIfSolved(){
 
 bool Puzzle::constraintPropagation() {
   
-    bool game = true, solved = true;
-    while (game) {
-        game = false;
+    bool gameOn = true;
+    while (gameOn) {
+        gameOn = false;
+
         for (size_t row = 0; row < SIZE; row++){
             for (size_t col = 0; col < SIZE; col++){
                 if (SudokuTable[row][col].value == 0){
                     bool peers[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-                    // bool _possibleSolution = SudokuTable[row][col].possibleSolutions[SIZE]; // TODO: would be nice to avoid creating another bool array...
+                    // bool _possibleSolution = SudokuTable[row][col].hypos[SIZE]; // TODO: would be nice to avoid creating another bool array...
                     checkRow( peers, row);
                     checkCol( peers, col);
                     checkBox( peers, row, col);
 
-                    int solutions = 0;                  // Varible that counts possible solutions in each cell aka possibleSolutions array
+                    int solutions = 0;                  // Varible that counts possible solutions in each cell aka hypos array
                     int location = 0;                   // Where in the array the solution exist. 0 = 1, 1 = 2 etc // TODO: look into use bits instead of looping array
 
                     for (size_t i = 0; i < SIZE; i++) {
@@ -145,11 +173,11 @@ bool Puzzle::constraintPropagation() {
                     }
                     if(solutions == 1) {
                         SudokuTable[row][col].value = location + 1; // If only one solution then this as .value
-                        game = true;
+                        gameOn = true;
                     }
                     else {
                         for (size_t i = 0; i < SIZE; i++) {
-                            SudokuTable[row][col].possibleSolutions[i] = peers[i];
+                            SudokuTable[row][col].hypos[i] = peers[i];
                         }
                     }
                 }
@@ -159,7 +187,7 @@ bool Puzzle::constraintPropagation() {
     return checkIfSolved();
 }
 
-bool Puzzle::bruteForce(unsigned int _row, unsigned int _col) {
+bool Puzzle::search(unsigned int _row, unsigned int _col) {
     bool success = false;
 
     if ( _row == 8 && _col == 9 ) {
@@ -171,7 +199,7 @@ bool Puzzle::bruteForce(unsigned int _row, unsigned int _col) {
     }
     // If the cells value is NOT 0, then move on to the next one
     if( SudokuTable[_row][_col].value != 0 ){
-        return bruteForce( _row, _col + 1);
+        return search( _row, _col + 1);
     }
     // Check possible solutions for this cell before brute forcing
     bool peers[SIZE] = {1,1,1,1,1,1,1,1,1}; // TODO: look into use bits instead of looping array
@@ -183,7 +211,7 @@ bool Puzzle::bruteForce(unsigned int _row, unsigned int _col) {
     for (size_t i = 0; i < SIZE; i++) {
         if( peers[i] == 1 ){
             SudokuTable[_row][_col].value = i+1;
-            if( bruteForce(_row, _col+1) ){
+            if( search(_row, _col+1) ){
                 success = true;
                 // break;
                 return true;
@@ -199,7 +227,7 @@ void Puzzle::printSudokuOnOneLine() {
     for (size_t _row = 0; _row < SIZE; _row++) {
         for (size_t _col = 0; _col < SIZE; _col++) {
             char now = SudokuLine[stringIndex];
-            if( (SudokuTable[_row][_col].value == 0)  ) { //TODO: Not working
+            if( (SudokuTable[_row][_col].value == 0)  ) {
                 std::cout << "\x1B[0m"
                           << ".";
             }

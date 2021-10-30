@@ -7,6 +7,7 @@
 int main(int argc, char *argv[]) {
 
     std::string filename = "../data/input/easy.txt";
+    // std::string filename = "../data/input/puzzle_evil.txt";
     std::vector<std::string> allSudokus;
 
     if( fileToVector(filename, allSudokus) ){
@@ -16,8 +17,8 @@ int main(int argc, char *argv[]) {
             std::cout << "Line: " << i++ << std::endl;
 
             Puzzle puzzle(oneLine);
-            puzzle.parser();
-            std::cout <<   "_________________________________________________________________________________________________________________\n";
+
+            std::cout <<   "========================================================================\n";
         }
     }
 

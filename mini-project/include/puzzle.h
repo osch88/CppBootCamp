@@ -10,7 +10,7 @@
 class Puzzle {
     private:
         std::string SudokuLine;
-        SudokoCell_t SudokuTable[SIZE][SIZE];
+        SudokuCell_t SudokuTable[SIZE][SIZE];
         std::string solved = "tbd";
         // Sudoku SudokuTable;
 
@@ -18,15 +18,24 @@ class Puzzle {
         Puzzle(const std::string &_SudokuLine);
         void solver();
         bool parser();
+        
         void checkRow(bool _peers[SIZE], const unsigned int &row);
         void checkCol(bool _peers[SIZE], const unsigned int &col);
         void checkBox(bool _peers[SIZE], const unsigned int &row, const unsigned int &col);
         void checkUnits(const unsigned int &row, const unsigned int &col);
+        
+        // In progress
+        bool usedInRow(const unsigned int &row, const unsigned int &num);
+        bool usedInCol(const unsigned int &col, const unsigned int &num);
+        bool usedInBox(const unsigned int &row, const unsigned int &col, const unsigned int &num);
+        
         bool checkIfSolved();
         bool constraintPropagation();
-        bool bruteForce(unsigned int row, unsigned int col);
+        bool search(unsigned int row, unsigned int col);
+
         void printSudokuOnOneLine();
         std::string checkSolutionStatus();
+
         ~Puzzle() = default;
 
 };
