@@ -7,15 +7,18 @@ Puzzle::Puzzle(const std::string &_SudokuLine) {
 
 void Puzzle::solver(){
     if( parser() ){
-        
+/*
         std::cout << "Input Sudoko:\t\t";
         printSudokuOnOneLine();
         std::cout << std::endl;
-
+*/
+        constraintPropagation();
+        // print();
+/*
         if( constraintPropagation() ){
             solved = "Constrain Propogation";
             std::cout << "Constrain Propogation:\t";
-            printSudokuOnOneLine();
+            print();
             std::cout << std::endl;
         }
         else{
@@ -34,6 +37,7 @@ void Puzzle::solver(){
             }
         }
         std::cout << "Solver:\t" << solved << std::endl;
+*/
     }
     else {
         std::cout << "Could not parse the input" << std::endl;
@@ -60,6 +64,8 @@ bool Puzzle::parser(){
         size_t row = 0, col = 0;
         for (size_t k = 0; k < numbers.size(); k++) {
             SudokuTable[row][col].value = numbers[k];
+            SudokuTable[row][col].initiatedValue = numbers[k];
+            if( numbers[k] != 0 ) SudokuTable[row][col].valueSet = true;
             col++;
             if (!(k + 1) % 9) { // Takes care of new a row in the table
                 row++;
@@ -150,12 +156,13 @@ bool Puzzle::checkIfSolved(){
 bool Puzzle::constraintPropagation() {
   
     bool gameOn = true;
+    unsigned int counter = 0, fromStart = 0;
     while (gameOn) {
         gameOn = false;
 
         for (size_t row = 0; row < SIZE; row++){
             for (size_t col = 0; col < SIZE; col++){
-                if (SudokuTable[row][col].value == 0){
+                if (SudokuTable[row][col].valueSet == false){
                     bool peers[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
                     // bool _possibleSolution = SudokuTable[row][col].hypos[SIZE]; // TODO: would be nice to avoid creating another bool array...
                     checkRow( peers, row);
@@ -173,7 +180,9 @@ bool Puzzle::constraintPropagation() {
                     }
                     if(solutions == 1) {
                         SudokuTable[row][col].value = location + 1; // If only one solution then this as .value
+                        SudokuTable[row][col].valueSet = true;
                         gameOn = true;
+                        counter++;
                     }
                     else {
                         for (size_t i = 0; i < SIZE; i++) {
@@ -181,9 +190,13 @@ bool Puzzle::constraintPropagation() {
                         }
                     }
                 }
+                else {
+                    fromStart++;
+                }
             }
         }
     }
+    printf("\nFrom start: %u\nPropogated cells: %u\n", fromStart, counter);
     return checkIfSolved();
 }
 
@@ -226,12 +239,11 @@ void Puzzle::printSudokuOnOneLine() {
     unsigned stringIndex = 0;
     for (size_t _row = 0; _row < SIZE; _row++) {
         for (size_t _col = 0; _col < SIZE; _col++) {
-            char now = SudokuLine[stringIndex];
             if( (SudokuTable[_row][_col].value == 0)  ) {
                 std::cout << "\x1B[0m"
                           << ".";
             }
-            else if( ( SudokuTable[_row][_col].value == (now - 48) ) ) {  // IF same value in solution as in input
+            else if( SudokuTable[_row][_col].value == SudokuTable[_row][_col].initiatedValue ) {  // IF same value in solution as in input
                 std::cout << "\x1B[0m"
                           << SudokuTable[_row][_col].value;
             }
@@ -245,6 +257,47 @@ void Puzzle::printSudokuOnOneLine() {
     }
     std::cout << "\x1B[0m";
 }
+
+void Puzzle::print() {
+    for (size_t _row = 0; _row < SIZE; _row++) {
+        for (size_t _col = 0; _col < SIZE; _col++) {
+            if ( SudokuTable[_row][_col].value == SudokuTable[_row][_col].initiatedValue ) {
+                if ( SudokuTable[_row][_col].value == 0 ) {
+                    std::cout << "\x1B[31m"
+                              << "[";
+                    for (size_t k = 0; k < SIZE; k++) {
+                        if ( SudokuTable[_row][_col].hypos[k] == 0 ) {
+                            std::cout << "_";
+                        }
+                        else {
+                            std::cout << "\x1B[31m" << k + 1 << "";
+                        }
+                    }
+                    std::cout << "\x1B[31m"
+                              << "]";
+                }
+                else {
+                    std::cout << "\x1B[90m"
+                              << "     " << SudokuTable[_row][_col].value << "     ";
+                }
+            }
+            else {
+                std::cout << "\x1B[32m"
+                          << "     " << SudokuTable[_row][_col].value << "     ";
+            }
+            if (_col == 2 || _col == 5) {
+                std::cout << "\x1B[0m"
+                          << " | ";
+            }
+        }
+        std::cout << "\n";
+        if (_row == 2 || _row == 5) {
+            std::cout << "\x1B[37m"
+                      << "----------------------------------+-----------------------------------+----------------------------------\n";
+        }
+    }
+    std::cout << "\x1B[0m" << std::endl;
+};
 
 std::string Puzzle::checkSolutionStatus(){
     std::cout << solved << std::endl;

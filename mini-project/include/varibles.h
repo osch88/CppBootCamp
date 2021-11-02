@@ -13,14 +13,16 @@ typedef struct CellCoordinates {
 
 typedef struct SudokuCell {
     unsigned int value;
-    bool hypos[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1}; // 0 == false
-                                                                // { 1,2,3,4,5,6,7,8,9 }
+    unsigned int initiatedValue;
+    bool hypos[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1}; // 0 == false   { 1,2,3,4,5,6,7,8,9 }
+    
     unsigned int noHypos;
-    Coord_t units[3][9];
-    Coord_t peers[20];
+    bool peers[20];
+    bool valueSet = false;
+    // Coord_t units[3][9];
+    // Coord_t peers[20];
 
 } SudokuCell_t;
-
 
 // std::array<std::array<SudokuCell_t, SIZE>, SIZE> SudokuBoard;
 

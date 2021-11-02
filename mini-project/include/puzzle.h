@@ -34,6 +34,7 @@ class Puzzle {
         bool search(unsigned int row, unsigned int col);
 
         void printSudokuOnOneLine();
+        void print();
         std::string checkSolutionStatus();
 
         ~Puzzle() = default;
