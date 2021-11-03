@@ -13,6 +13,9 @@ void Puzzle::solver(){
         std::cout << std::endl;
 */
         constraintPropagation();
+        constraintPropagation();
+        // constraintPropagation();
+        // constraintPropagation();
         // print();
 /*
         if( constraintPropagation() ){
@@ -65,7 +68,10 @@ bool Puzzle::parser(){
         for (size_t k = 0; k < numbers.size(); k++) {
             SudokuTable[row][col].value = numbers[k];
             SudokuTable[row][col].initiatedValue = numbers[k];
-            if( numbers[k] != 0 ) SudokuTable[row][col].valueSet = true;
+            if( numbers[k] != 0 ){
+                SudokuTable[row][col].valueSet = true;
+                valueSetCounter++;
+            }
             col++;
             if (!(k + 1) % 9) { // Takes care of new a row in the table
                 row++;
@@ -77,161 +83,287 @@ bool Puzzle::parser(){
     return solved;
 }
 
-bool Puzzle::usedInRow(const unsigned int &row, const unsigned int &num){
-    bool solved = false;
-    for (size_t i = 0; i < SIZE; i++) {
-        if( SudokuTable[row][i].value == num) solved = true;
-    }
-    return solved;
-}
-
-bool Puzzle::usedInCol(const unsigned int &col, const unsigned int &num){
-    bool solved = false;
-    for (size_t i = 0; i < SIZE; i++) {
-        if( SudokuTable[i][col].value == num) solved = true;
-    }
-    return solved;
-}
-
-bool Puzzle::usedInBox(const unsigned int &row, const unsigned int &col, const unsigned int &num){
-    bool solved = false;
-    for (size_t i = 0; i < 3; i++) {
-        for (size_t j = 0; j < 3; j++) {
-            if( SudokuTable[(row - row % 3) + i][ (col - col % 3) + j].value == num) solved = true;
-        }
-    }
-    return solved;
-}
-
-void Puzzle::checkRow(bool _peers[SIZE], const unsigned int &row) {
+void Puzzle::hypoRow(const unsigned int &row, const unsigned int &col) {
     for (size_t i = 0; i < SIZE; i++) {
         if( SudokuTable[row][i].value != 0 ) {
-            int tmp = SudokuTable[row][i].value;
-            _peers[tmp - 1] = false;
+            unsigned int value = SudokuTable[row][i].value;
+            SudokuTable[row][col].hypoBits.reset(value-1);
         }
+    }
+    SudokuTable[row][col].noHypos = SudokuTable[row][col].hypoBits.count();
+    if ( SudokuTable[row][col].noHypos == 1 && SudokuTable[row][col].valueSet == false){
+        setValueToCell(row, col);
     }
 }
 
-void Puzzle::checkCol(bool _peers[SIZE], const unsigned int &col) {
+void Puzzle::hypoColumn(const unsigned int &row, const unsigned int &col) {
     for (size_t i = 0; i < SIZE; i++) {
-        if (SudokuTable[i][col].value != 0) {
-            int tmp = SudokuTable[i][col].value;
-            _peers[tmp - 1] = false;
+        if( SudokuTable[i][col].value != 0 ) {
+            unsigned int value = SudokuTable[i][col].value;
+            SudokuTable[row][col].hypoBits.reset(value-1);
         }
+    }
+    SudokuTable[row][col].noHypos = SudokuTable[row][col].hypoBits.count();
+    if ( SudokuTable[row][col].noHypos == 1 && SudokuTable[row][col].valueSet == false){
+        setValueToCell(row, col);
     }
 }
 
-void Puzzle::checkBox(bool _peers[SIZE], const unsigned int &row, const unsigned int &col) {
+void Puzzle::hypoBox(const unsigned int &row, const unsigned int &col) {
+    unsigned tmp_row;
+    unsigned tmp_col;
     for (size_t i = 0; i < 3; i++) {
         for (size_t j = 0; j < 3; j++) {
-            int tmp = SudokuTable[(row - row % 3) + i][ (col - col % 3) + j].value;
-            if (tmp != 0) {
-                _peers[tmp - 1] = false;
+            tmp_row = (row - row % 3) + i;
+            tmp_col = (col - col % 3) + j;   
+            if( SudokuTable[tmp_row][tmp_col].value != 0 ){
+                unsigned int value = SudokuTable[tmp_row][tmp_col].value;
+                SudokuTable[row][col].hypoBits.reset(value-1);
             }
+        }
+    }
+    SudokuTable[row][col].noHypos = SudokuTable[row][col].hypoBits.count();
+    if ( SudokuTable[row][col].noHypos == 1 && SudokuTable[row][col].valueSet == false){
+        setValueToCell(row, col);
+    }
+}
+
+unsigned int Puzzle::findUniqueHypoValue(const unsigned int &row, const unsigned int &col){
+    unsigned int value = 0;
+    for (size_t i = SIZE; i > 0; i--) {
+        if( SudokuTable[row][col].hypoBits[i-1] == 1 ){
+            value = i;
+            break;
+        }
+    }
+    return value;
+}
+
+unsigned int Puzzle::findUniquePeerValue(const unsigned int &row, const unsigned int &col){
+    unsigned int value = 0;
+    for (size_t i = SIZE; i > 0; i--) {
+        if( SudokuTable[row][col].peers[i-1] == 1 ){
+            value = i;
+            break;
+        }
+    }
+    return value;
+}
+
+void Puzzle::setValueToCell(const unsigned int &row, const unsigned int &col){
+    if (SudokuTable[row][col].valueSet == false) {
+        unsigned int value = findUniqueHypoValue(row, col);
+        SudokuTable[row][col].value = value;
+        SudokuTable[row][col].valueSet = true;
+        valueSetCounter++;
+        runUnits(row, col);
+        updateHypos(row, col);
+    }
+}
+
+void Puzzle::setValueToCellPeer(const unsigned int &row, const unsigned int &col){
+    if (SudokuTable[row][col].valueSet == false) {
+        unsigned int value = findUniquePeerValue(row, col);
+        // std::cout << "Value: " << value << std::endl;
+        SudokuTable[row][col].value = value;
+        SudokuTable[row][col].valueSet = true;
+        valueSetCounter++;
+        runUnits(row, col);
+        updateHypos(row, col);
+        // print();
+
+    }
+
+}
+
+void Puzzle::runUnits(const unsigned int &row, const unsigned int &col){
+    for (size_t i = 0; i < SIZE; i++) {
+        hypoRow(row, i);
+        hypoColumn(i, col);
+        findUniquePeer(row, i);
+        findUniquePeer(i, col);
+    }
+    unsigned tmp_row;
+    unsigned tmp_col;
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            tmp_row = (row - row % 3) + i;
+            tmp_col = (col - col % 3) + j;
+            hypoBox(tmp_row, tmp_col);
+            // findUniquePeerValue(tmp_row, tmp_col);
         }
     }
 }
 
-void Puzzle::checkUnits(const unsigned int &row, const unsigned int &col){
+void Puzzle::updateHypos(const unsigned int &row, const unsigned int &col){
 
-    bool peers[SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-
-    checkRow( peers, row );
-    checkCol( peers, col );
-    checkBox( peers, row, col );
-}
-
-bool Puzzle::checkIfSolved(){
-    bool solved = true;
-    for (size_t row = 0; row < SIZE; row++){
-        for (size_t col = 0; col < SIZE; col++){
-            if (SudokuTable[row][col].value == 0){ 
-                solved = false;
-            }
-        }
-    }
-    return solved;
+    hypoRow( row, col );
+    hypoColumn( row, col );
+    hypoBox( row, col );    // Only checking the one cell that are calling the function...
+    // findUniquePeer(row, col);    
 }
 
 bool Puzzle::constraintPropagation() {
-  
-    bool gameOn = true;
-    unsigned int counter = 0, fromStart = 0;
-    while (gameOn) {
-        gameOn = false;
-
-        for (size_t row = 0; row < SIZE; row++){
-            for (size_t col = 0; col < SIZE; col++){
-                if (SudokuTable[row][col].valueSet == false){
-                    bool peers[SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-                    // bool _possibleSolution = SudokuTable[row][col].hypos[SIZE]; // TODO: would be nice to avoid creating another bool array...
-                    checkRow( peers, row);
-                    checkCol( peers, col);
-                    checkBox( peers, row, col);
-
-                    int solutions = 0;                  // Varible that counts possible solutions in each cell aka hypos array
-                    int location = 0;                   // Where in the array the solution exist. 0 = 1, 1 = 2 etc // TODO: look into use bits instead of looping array
-
-                    for (size_t i = 0; i < SIZE; i++) {
-                        if (peers[i] != 0) {
-                            solutions++;
-                            location = i;
-                        }
-                    }
-                    if(solutions == 1) {
-                        SudokuTable[row][col].value = location + 1; // If only one solution then this as .value
-                        SudokuTable[row][col].valueSet = true;
-                        gameOn = true;
-                        counter++;
-                    }
-                    else {
-                        for (size_t i = 0; i < SIZE; i++) {
-                            SudokuTable[row][col].hypos[i] = peers[i];
-                        }
-                    }
-                }
-                else {
-                    fromStart++;
-                }
+    std::cout << "\n\n---------------------INPUT-----------------\n\n";
+    print();
+    for (size_t row = 0; row < SIZE; row++){
+        for (size_t col = 0; col < SIZE; col++){
+            if (SudokuTable[row][col].valueSet == false && valueSetCounter != 81){
+                updateHypos(row, col);
             }
         }
     }
-    printf("\nFrom start: %u\nPropogated cells: %u\n", fromStart, counter);
-    return checkIfSolved();
+
+    std::cout << "\n\n---------------------CONSTRAINED-----------------\n\n";
+    print();
+    std::cout << "\n\n---------------------2nd LAW-----------------\n\n";
+
+    for (size_t row = 0; row < SIZE; row++){
+        for (size_t col = 0; col < SIZE; col++){
+            if (SudokuTable[row][col].valueSet == false && valueSetCounter != 81){
+                findUniquePeer(row, col);
+            }
+        }
+    }
+
+    std::cout <<  "Numbers of solved cells: " << valueSetCounter << std::endl;
+
+    return true;
 }
 
-bool Puzzle::search(unsigned int _row, unsigned int _col) {
-    bool success = false;
-
-    if ( _row == 8 && _col == 9 ) {
-        return true;
-    }
-    if ( _col == 9 ) {
-        _row++;
-        _col = 0;
-    }
-    // If the cells value is NOT 0, then move on to the next one
-    if( SudokuTable[_row][_col].value != 0 ){
-        return search( _row, _col + 1);
-    }
-    // Check possible solutions for this cell before brute forcing
-    bool peers[SIZE] = {1,1,1,1,1,1,1,1,1}; // TODO: look into use bits instead of looping array
-
-    checkRow( peers, _row);
-    checkCol( peers, _col);
-    checkBox( peers, _row, _col);
-
+void Puzzle::valueInRow(const unsigned int &row, const unsigned int &col){
     for (size_t i = 0; i < SIZE; i++) {
-        if( peers[i] == 1 ){
-            SudokuTable[_row][_col].value = i+1;
-            if( search(_row, _col+1) ){
-                success = true;
-                // break;
-                return true;
-            }
+        if( col == i) continue;   // Don't include the calling cell in the peers
+        else if( SudokuTable[row][i].valueSet == true) {
+            unsigned value = SudokuTable[row][i].value;
+            SudokuTable[row][col].peers.set(value-1);
+            // std::cout << row << "-" << i << "now set to: " << value << "\n";
+        }
+        else {
+            SudokuTable[row][col].peers = SudokuTable[row][col].peers | SudokuTable[row][i].hypoBits;
         }
     }
-    SudokuTable[_row][_col].value = 0;
+    SudokuTable[row][col].peers.flip();
+    SudokuTable[row][col].peers = (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers);
+    
+    if( SudokuTable[row][col].peers.count() == 1 ){
+
+        // std::cout << "Unique: [ " << row << " - " << col << " ]\n";
+        // std::cout << "Hypos:\t" << SudokuTable[row][col].hypoBits << std::endl;
+        // std::cout << "Peers:\t" << SudokuTable[row][col].peers << std::endl;
+        // std::cout << "Unique:\t" << (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers) << std::endl;
+        // std::cout << "Unique:\t" << (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers).count() << std::endl;
+        setValueToCellPeer(row, col);
+    }
+}
+void Puzzle::valueInCol(const unsigned int &row, const unsigned int &col){
+    for (size_t i = 0; i < SIZE; i++) {
+        if( row == i) continue;        // Don't include the calling cell in the peers
+        else if( SudokuTable[i][col].valueSet == true) {
+            unsigned value = SudokuTable[i][col].value;
+            SudokuTable[row][col].peers.set(value-1);
+        }
+        else {
+            SudokuTable[row][col].peers = SudokuTable[row][col].peers | SudokuTable[i][col].hypoBits;
+        }
+    }
+    SudokuTable[row][col].peers.flip();
+    SudokuTable[row][col].peers = (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers);
+    
+    if( SudokuTable[row][col].peers.count() == 1 ){
+
+        // std::cout << "Unique: [ " << row << " - " << col << " ]\n";
+        // std::cout << "Hypos:\t" << SudokuTable[row][col].hypoBits << std::endl;
+        // std::cout << "Peers:\t" << SudokuTable[row][col].peers << std::endl;
+        // std::cout << "Unique:\t" << (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers) << std::endl;
+        // std::cout << "Unique:\t" << (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers).count() << std::endl;
+        setValueToCellPeer(row, col);
+    }
+}
+void Puzzle::valueInBox(const unsigned int &row, const unsigned int &col){
+    bool success = false;
+    unsigned tmp_row;
+    unsigned tmp_col;
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            tmp_row = (row - row % 3) + i;
+            tmp_col = (col - col % 3) + j;
+
+            if( ( tmp_row == row ) && ( tmp_col == col) ) continue;     // Do not overide the asking cell
+            else if( SudokuTable[tmp_row][tmp_col].valueSet == true ){
+
+                // std::cout << "[" << tmp_row << ", " << tmp_col << "] ";
+
+
+                unsigned int value = SudokuTable[tmp_row][tmp_col].value;
+                SudokuTable[row][col].peers.set(value-1);
+            }
+            else {
+
+                // std::cout << "[" << tmp_row << ", " << tmp_col << "] ";
+
+                SudokuTable[row][col].peers = SudokuTable[row][col].peers | SudokuTable[tmp_row][tmp_col].hypoBits; 
+            }
+        }
+        // std::cout << "\n";
+    }
+    SudokuTable[row][col].peers.flip();
+    SudokuTable[row][col].peers = (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers);
+    
+    if( SudokuTable[row][col].peers.count() == 1 ){
+
+        // std::cout << "Unique: [ " << row << " - " << col << " ]\n";
+        // std::cout << "Hypos:\t" << SudokuTable[row][col].hypoBits << std::endl;
+        // std::cout << "Peers:\t" << SudokuTable[row][col].peers << std::endl;
+        // std::cout << "Unique:\t" << (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers) << std::endl;
+        // std::cout << "Unique:\t" << (SudokuTable[row][col].hypoBits & SudokuTable[row][col].peers).count() << std::endl;
+        setValueToCellPeer(row, col);
+
+    }
+}
+
+void Puzzle::findUniquePeer(const unsigned int &row, const unsigned int &col){
+    SudokuTable[row][col].peers.reset();
+    valueInRow(row, col);
+    SudokuTable[row][col].peers.reset();
+    valueInCol(row, col);
+    SudokuTable[row][col].peers.reset();
+    valueInBox(row, col);
+}
+
+
+bool Puzzle::search(unsigned int _row, unsigned int _col) {
+    // bool success = false;
+
+    // if ( _row == 8 && _col == 9 ) {
+    //     return true;
+    // }
+    // if ( _col == 9 ) {
+    //     _row++;
+    //     _col = 0;
+    // }
+    // // If the cells value is NOT 0, then move on to the next one
+    // if( SudokuTable[_row][_col].value != 0 ){
+    //     return search( _row, _col + 1);
+    // }
+    // // Check possible solutions for this cell before brute forcing
+    // bool peers[SIZE] = {1,1,1,1,1,1,1,1,1}; // TODO: look into use bits instead of looping array
+
+    // checkRow( peers, _row);
+    // checkCol( peers, _col);
+    // checkBox( peers, _row, _col);
+
+    // for (size_t i = 0; i < SIZE; i++) {
+    //     if( peers[i] == 1 ){
+    //         SudokuTable[_row][_col].value = i+1;
+    //         if( search(_row, _col+1) ){
+    //             success = true;
+    //             // break;
+    //             return true;
+    //         }
+    //     }
+    // }
+    // SudokuTable[_row][_col].value = 0;
     return false;
 }
 
@@ -261,29 +393,29 @@ void Puzzle::printSudokuOnOneLine() {
 void Puzzle::print() {
     for (size_t _row = 0; _row < SIZE; _row++) {
         for (size_t _col = 0; _col < SIZE; _col++) {
-            if ( SudokuTable[_row][_col].value == SudokuTable[_row][_col].initiatedValue ) {
-                if ( SudokuTable[_row][_col].value == 0 ) {
-                    std::cout << "\x1B[31m"
-                              << "[";
-                    for (size_t k = 0; k < SIZE; k++) {
-                        if ( SudokuTable[_row][_col].hypos[k] == 0 ) {
-                            std::cout << "_";
-                        }
-                        else {
-                            std::cout << "\x1B[31m" << k + 1 << "";
-                        }
+            if ( SudokuTable[_row][_col].valueSet == false ) {
+                std::cout   << "\x1B[31m"
+                            << "[";
+                for (size_t i = SIZE; i > 0; i--) {
+                    if ( SudokuTable[_row][_col].hypoBits[i-1] == 1 ){
+                        std::cout << i;
                     }
-                    std::cout << "\x1B[31m"
-                              << "]";
-                }
-                else {
-                    std::cout << "\x1B[90m"
-                              << "     " << SudokuTable[_row][_col].value << "     ";
-                }
+                    else {
+                        std::cout << "_";
+                    }
+                    // std::cout << i;
+                }                
+                std::cout   << "]";
             }
             else {
-                std::cout << "\x1B[32m"
-                          << "     " << SudokuTable[_row][_col].value << "     ";
+                if( SudokuTable[_row][_col].value == SudokuTable[_row][_col].initiatedValue ){
+                    std::cout << "\x1B[0m"
+                              << "     " << SudokuTable[_row][_col].value << "     ";
+                }
+                else {
+                    std::cout << "\x1B[32m"
+                              << "     " << SudokuTable[_row][_col].value << "     ";
+                }
             }
             if (_col == 2 || _col == 5) {
                 std::cout << "\x1B[0m"
