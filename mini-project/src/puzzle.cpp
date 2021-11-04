@@ -19,15 +19,18 @@ bool Puzzle::solver(){
             print();
             std::cout << std::endl;
 
-            if( search(0,0) ){
+            if( search() ){
+            // if( search(0, 0) ){
                 success = true;
-                solved = "Brute force";
-                std::cout << "Bruteforce:\t\t";
-                printSudokuOnOneLine();
+                solved = "With Search";
+                std::cout << "With Search:\n";
+                print();
                 std::cout << std::endl;
             }
             else {
                 solved = "No solution";
+                std::cout << "\nWith Search:\n";
+                print();
             }
         }
         std::cout << "Solver:\t" << solved << std::endl;
@@ -295,39 +298,66 @@ void Puzzle::findUniquePeer(const unsigned int &row, const unsigned int &col){
     SudokuTable[row][col].peers.reset();
 }
 
-bool Puzzle::search(unsigned int _row, unsigned int _col) {
+bool Puzzle::findSmallestHypo(){
     bool success = false;
-
-    if ( _row == 8 && _col == 9 ) {
-        return true;
-    }
-    if ( _col == 9 ) {
-        _row++;
-        _col = 0;
-    }
-    // If the cells valueSet == true, move on to the next cell
-    if( SudokuTable[_row][_col].valueSet == true ){
-        return search( _row, _col + 1);
-    }
-    else {
-        // Loop of Hypos, set one check etc..
-        unsigned int value = 0;
-        for (size_t i = SIZE; i > 0; i--) {
-            if( SudokuTable[_row][_col].hypoBits[i-1] != 0 ){
-                value = i;
-                SudokuTable[_row][_col].value = value;
-                SudokuTable[_row][_col].valueSet = true;
-                valueSetCounter++;
-                guessCounter++; 
-                if ( search(_row, _col + 1) ) return true;
+    for (size_t row = 0; row < SIZE; row++){
+        for (size_t col = 0; col < SIZE; col++){
+            if( SudokuTable[row][col].valueSet == false ){
+                if( SudokuTable[row][col].noHypos < minHypos.noHypos ){
+                    minHypos.row = row;
+                    minHypos.col = col;
+                    minHypos.noHypos = SudokuTable[row][col].noHypos;
+                }
+                success = true;
+            }
         }
     }
-        SudokuTable[_row][_col].value = 0;
-        SudokuTable[_row][_col].valueSet = false;
-        valueSetCounter--;
+    return success;
+}
 
-        return false;
+bool Puzzle::search() {
+    bool success = false;
+
+    if( !findSmallestHypo() ){
+        return true;
     }
+
+    unsigned int _row = minHypos.row;
+    unsigned int _col = minHypos.col;
+
+    // Copy the puzzle
+    SudokuCell_t copyTable[SIZE][SIZE];
+    for (size_t row = 0; row < SIZE; row++){
+        for (size_t col = 0; col < SIZE; col++){
+            copyTable[row][col] = SudokuTable[row][col];
+        }
+    }
+    // Loop of Hypos, set one check etc..
+    unsigned int value = 0;
+    for (size_t i = SIZE; i > 0; i--) {
+        if( SudokuTable[_row][_col].hypoBits[i-1] == 1 ){
+            value = i;
+            guessCounter++;
+
+            SudokuTable[_row][_col].value = value;
+            SudokuTable[_row][_col].valueSet = true;
+
+            minHypos.noHypos = 99;
+
+            constraintPropagation();
+
+            if ( search() ){
+                return true;
+            }
+        }
+        // Reset the puzzle
+        for (size_t row = 0; row < SIZE; row++){
+            for (size_t col = 0; col < SIZE; col++){
+                SudokuTable[row][col] = copyTable[row][col];
+            }
+        }
+    }
+    return false;
 }
 
 void Puzzle::printSudokuOnOneLine() {

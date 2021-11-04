@@ -17,5 +17,10 @@ typedef struct SudokuCell {
 
 } SudokuCell_t;
 
+typedef struct CellWithMinHypos {
+    unsigned int noHypos = 10;
+    unsigned int row;
+    unsigned int col;
+} minHypos_t;
 
 #endif

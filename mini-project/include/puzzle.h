@@ -11,8 +11,11 @@
 class Puzzle {
     private:
         std::string SudokuLine;
-        SudokuCell_t SudokuTable[SIZE][SIZE];
         std::string solved;
+
+        SudokuCell_t SudokuTable[SIZE][SIZE];
+        minHypos_t minHypos;
+      
         unsigned int valueSetCounter = 0;
         unsigned int guessCounter = 0;
 
@@ -28,6 +31,7 @@ class Puzzle {
         void hypoColumn( const unsigned int &row, const unsigned int &col);
         void hypoBox( const unsigned int &row, const unsigned int &col);
         void updateHypos(const unsigned int &row, const unsigned int &col);
+        unsigned int findUniqueHypoValue(const unsigned int &row, const unsigned int &col);
         void setValueToCellFromHypo(const unsigned int &row, const unsigned int &col);
         
         // Peers
@@ -37,10 +41,10 @@ class Puzzle {
         void findUniquePeer(const unsigned int &row, const unsigned int &col);
         unsigned int findUniquePeerValue(const unsigned int &row, const unsigned int &col);
         void setValueToCellFromPeer(const unsigned int &row, const unsigned int &col);
-        unsigned int findUniqueHypoValue(const unsigned int &row, const unsigned int &col);
 
         // Search
-        bool search(unsigned int row, unsigned int col);
+        bool findSmallestHypo();
+        bool search();
 
     public:
         Puzzle(const std::string &_SudokuLine);
